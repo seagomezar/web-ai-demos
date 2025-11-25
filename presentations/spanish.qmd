@@ -41,6 +41,11 @@ Habilita estas flags en `chrome://flags`:
 
 Luego actualiza **Optimization Guide On Device Model** en `chrome://components`.
 
+::: {.notes}
+Estas flags son experimentales y necesarias para habilitar las APIs de Gemini Nano. El componente "Optimization Guide" es el que descarga y gestiona el modelo en sí. Asegúrense de que esté actualizado ("Fully downloaded") antes de intentar usar las APIs.
+:::
+
+
 ## Cambiando el Paradigma {background-gradient="linear-gradient(to bottom right, #2c3e50, #4ca1af)"}
 
 ::: {style="display: flex; justify-content: space-around; align-items: center; margin-top: 40px;"}
@@ -65,6 +70,11 @@ Usuario &larr; **Navegador** &rarr; Modelo
 Descentralización de la Inteligencia Artificial.
 :::
 
+::: {.notes}
+Estamos moviendo la inteligencia de la nube al borde (edge). En lugar de enviar datos a un servidor centralizado, traemos el modelo al usuario. Esto cambia fundamentalmente la arquitectura de las aplicaciones web modernas.
+:::
+
+
 ## ¿Por qué ejecutar IA en el navegador? {background-image="assets/privacy_shield_background_1764037863751.png" background-opacity="0.4"}
 
 <ul style="background: rgba(0,0,0,0.6); padding: 40px; border-radius: 15px;">
@@ -74,11 +84,21 @@ Descentralización de la Inteligencia Artificial.
   <li class="fragment"><strong>Offline:</strong> Funciona sin internet.</li>
 </ul>
 
+::: {.notes}
+La privacidad es el gran ganador aquí: datos sensibles como salud o finanzas nunca salen del dispositivo. La latencia es cero porque no hay round-trip al servidor. Y el costo de inferencia se mueve del proveedor al consumidor (su batería/GPU), lo que escala infinitamente gratis para ustedes.
+:::
+
+
 ## Las Limitaciones
 
 - **Hardware:** Depende de la GPU/RAM del usuario.
 - **Tamaño de Descarga:** Modelos enormes (GBs).
 - **Batería:** Consumo energético alto.
+
+::: {.notes}
+No todo es color de rosa. Los modelos son grandes (Gemma 2B son ~1.4GB). La descarga inicial es pesada. Y correr estos modelos consume batería rápidamente. Hay que ser responsables y cargar los modelos solo cuando sea necesario.
+:::
+
 
 ## El Espectro de Web AI
 
@@ -99,6 +119,13 @@ Gemini Nano
 :::
 
 :::
+
+::: {.notes}
+Tenemos dos sabores principales:
+1. **BYOM (Bring Your Own Model):** Usan WebGPU (vía MediaPipe o Transformers.js) para correr cualquier modelo (Gemma, Llama, Phi). Control total, pero ustedes gestionan la descarga del modelo.
+2. **Built-in AI:** El navegador ya tiene Gemini Nano integrado. Cero descarga para su web, API estandarizada, pero limitados al modelo que Chrome provee.
+:::
+
 
 # Descripción General {background-image="assets/browser_brain_background_1764037882897.png" background-opacity="0.5"}
 
@@ -642,6 +669,11 @@ const llm = await LlmInference.createFromOptions(genai, {
 const response = await llm.generateResponse(inputPrompt);
 ```
 
+::: {.notes}
+`FilesetResolver` se encarga de cargar los binarios de WebAssembly (WASM) necesarios. `LlmInference` es la clase principal. Noten que apuntamos a un modelo `.litertlm` o `.bin` que hemos alojado en nuestros assets. Los parámetros como `temperature` y `topK` controlan la creatividad del modelo.
+:::
+
+
 ## Multimodalidad (Gemma-3n) {class="bg-byom"}
 
 Soporte para Imágenes y Audio.
@@ -661,6 +693,11 @@ const response = await llm.generateResponse([
 ]);
 ```
 
+::: {.notes}
+Gemma-3n es multimodal nativo. Pueden pasarle texto, imágenes y audio en el mismo prompt. Esto abre posibilidades increíbles para accesibilidad, análisis de video frame-a-frame, y asistentes de voz más naturales.
+:::
+
+
 ## Personalización con LoRA {class="bg-byom"}
 
 Adaptación eficiente de modelos (Low-Rank Adaptation).
@@ -676,6 +713,11 @@ loraRanks: [4, 8, 16]
 const loraModel = await llm.loadLoraModel(loraModelUrl);
 llm.generateResponse(prompt, loraModel, callback);
 ```
+
+::: {.notes}
+LoRA (Low-Rank Adaptation) permite "afinar" el modelo para tareas específicas sin re-entrenarlo todo. Los pesos son pequeños (pocos MBs) y se pueden cargar dinámicamente. Imaginen tener un modelo base y cargar "plugins" de LoRA para diferentes estilos de escritura o conocimientos específicos.
+:::
+
 
 ## Cargando el Modelo (Worker) {class="bg-byom"}
 

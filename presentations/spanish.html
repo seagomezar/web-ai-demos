@@ -243,6 +243,19 @@ GDE en Web Technologies
 </ul>
 <div class="fragment">
 <p>Luego actualiza <strong>Optimization Guide On Device Model</strong> en <code>chrome://components</code>.</p>
+<aside class="notes">
+<p>Estas flags son experimentales y necesarias para habilitar las APIs de Gemini Nano. El componente “Optimization Guide” es el que descarga y gestiona el modelo en sí. Asegúrense de que esté actualizado (“Fully downloaded”) antes de intentar usar las APIs.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </div>
 </section>
 <section id="cambiando-el-paradigma" class="slide level2" data-background-gradient="linear-gradient(to bottom right, #2c3e50, #4ca1af)">
@@ -267,6 +280,19 @@ Web AI
 <div style="margin-top: 40px;">
 <p>Descentralización de la Inteligencia Artificial.</p>
 </div>
+<aside class="notes">
+<p>Estamos moviendo la inteligencia de la nube al borde (edge). En lugar de enviar datos a un servidor centralizado, traemos el modelo al usuario. Esto cambia fundamentalmente la arquitectura de las aplicaciones web modernas.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="por-qué-ejecutar-ia-en-el-navegador" class="slide level2" data-background-image="assets/privacy_shield_background_1764037863751.png" data-background-opacity="0.4">
 <h2>¿Por qué ejecutar IA en el navegador?</h2>
@@ -284,6 +310,19 @@ Web AI
 <strong>Offline:</strong> Funciona sin internet.
 </li>
 </ul>
+<aside class="notes">
+<p>La privacidad es el gran ganador aquí: datos sensibles como salud o finanzas nunca salen del dispositivo. La latencia es cero porque no hay round-trip al servidor. Y el costo de inferencia se mueve del proveedor al consumidor (su batería/GPU), lo que escala infinitamente gratis para ustedes.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="las-limitaciones" class="slide level2">
 <h2>Las Limitaciones</h2>
@@ -292,6 +331,19 @@ Web AI
 <li><strong>Tamaño de Descarga:</strong> Modelos enormes (GBs).</li>
 <li><strong>Batería:</strong> Consumo energético alto.</li>
 </ul>
+<aside class="notes">
+<p>No todo es color de rosa. Los modelos son grandes (Gemma 2B son ~1.4GB). La descarga inicial es pesada. Y correr estos modelos consume batería rápidamente. Hay que ser responsables y cargar los modelos solo cuando sea necesario.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="el-espectro-de-web-ai" class="slide level2">
 <h2>El Espectro de Web AI</h2>
@@ -311,6 +363,19 @@ Built-in AI
 <p><small>El navegador incluye el modelo</small></p>
 </div>
 </div>
+<aside class="notes">
+<p>Tenemos dos sabores principales: 1. <strong>BYOM (Bring Your Own Model):</strong> Usan WebGPU (vía MediaPipe o Transformers.js) para correr cualquier modelo (Gemma, Llama, Phi). Control total, pero ustedes gestionan la descarga del modelo. 2. <strong>Built-in AI:</strong> El navegador ya tiene Gemini Nano integrado. Cero descarga para su web, API estandarizada, pero limitados al modelo que Chrome provee.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section>
 <section id="descripción-general" class="title-slide slide level1 center" data-background-image="assets/browser_brain_background_1764037882897.png" data-background-opacity="0.5">
@@ -1029,6 +1094,19 @@ El resultado aparecerá aquí…
 <span id="cb18-10"><a href=""></a>})<span class="op">;</span></span>
 <span id="cb18-11"><a href=""></a></span>
 <span id="cb18-12"><a href=""></a><span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">generateResponse</span>(inputPrompt)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<aside class="notes">
+<p><code>FilesetResolver</code> se encarga de cargar los binarios de WebAssembly (WASM) necesarios. <code>LlmInference</code> es la clase principal. Noten que apuntamos a un modelo <code>.litertlm</code> o <code>.bin</code> que hemos alojado en nuestros assets. Los parámetros como <code>temperature</code> y <code>topK</code> controlan la creatividad del modelo.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="multimodalidad-gemma-3n" class="slide level2 bg-byom">
 <h2>Multimodalidad (Gemma-3n)</h2>
@@ -1045,6 +1123,19 @@ El resultado aparecerá aquí…
 <span id="cb19-10"><a href=""></a>  <span class="st">' and transcribe '</span><span class="op">,</span></span>
 <span id="cb19-11"><a href=""></a>  {<span class="dt">audioSource</span><span class="op">:</span> <span class="st">'/assets/test_audio.wav'</span>}</span>
 <span id="cb19-12"><a href=""></a>])<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<aside class="notes">
+<p>Gemma-3n es multimodal nativo. Pueden pasarle texto, imágenes y audio en el mismo prompt. Esto abre posibilidades increíbles para accesibilidad, análisis de video frame-a-frame, y asistentes de voz más naturales.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="personalización-con-lora" class="slide level2 bg-byom">
 <h2>Personalización con LoRA</h2>
@@ -1059,6 +1150,19 @@ El resultado aparecerá aquí…
 <span id="cb20-4"><a href=""></a><span class="co">// Carga y Uso</span></span>
 <span id="cb20-5"><a href=""></a><span class="kw">const</span> loraModel <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">loadLoraModel</span>(loraModelUrl)<span class="op">;</span></span>
 <span id="cb20-6"><a href=""></a>llm<span class="op">.</span><span class="fu">generateResponse</span>(prompt<span class="op">,</span> loraModel<span class="op">,</span> callback)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<aside class="notes">
+<p>LoRA (Low-Rank Adaptation) permite “afinar” el modelo para tareas específicas sin re-entrenarlo todo. Los pesos son pequeños (pocos MBs) y se pueden cargar dinámicamente. Imaginen tener un modelo base y cargar “plugins” de LoRA para diferentes estilos de escritura o conocimientos específicos.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
 <section id="cargando-el-modelo-worker" class="slide level2 bg-byom">
 <h2>Cargando el Modelo (Worker)</h2>
