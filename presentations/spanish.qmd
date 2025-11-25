@@ -18,7 +18,7 @@ format:
 ---
 
 <div style="text-align: center; margin-top: 20px;">
-  <img src="assets/WebGDE Avatar.png" style="width: 150px; height: 150px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+  <img src="assets/slide Promo.png" style="max-width: 600px; width: 100%; border-radius: 15px; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
   <p style="font-size: 1.2em; margin-top: 10px; margin-bottom: 5px;">Engineering Manager at Twilio</p>
   <p style="font-size: 1.2em; margin-top: 0;">GDE en Web Technologies</p>
 </div>
