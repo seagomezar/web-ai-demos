@@ -1,0 +1,891 @@
+
+---
+title: "Usa las APIs de IA que Chrome tiene para ti"
+author: "Sebastian Gomez - @sebasgojs"
+format:
+  revealjs:
+    theme: black
+    css: styles.css
+    highlight-style: monokai
+    slide-number: true
+    slide-level: 2
+    hash: true
+    logo: assets/logo.png
+    footer: "www.sebastian-gomez.com - @sebasgojs"
+    include-after-body:
+      - text: |
+          <script src="scripts.js"></script>
+---
+
+<div style="text-align: center; margin-top: 20px;">
+  <img src="assets/WebGDE Avatar.png" style="width: 150px; height: 150px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+  <p style="font-size: 1.2em; margin-top: 10px; margin-bottom: 5px;">Engineering Manager at Twilio</p>
+  <p style="font-size: 1.2em; margin-top: 0;">GDE en Web Technologies</p>
+</div>
+
+::: {.notes}
+¿Alguna vez has estado en un avión sin internet? ¿Quisieras seguir chateando con Gemini, ChatGPT o Claude Code?, quizá no, pero quizá hayas creado un espectacular sitio web que necesite traducción (y no pagar por ella), o quizá desees que un texto en tu aplicación se vea diferente dependiendo del país, el lenguaje o región? Uneté a mí en esta charla donde te muestro cómo usar IA en aplicaciones para el browser, sin costo y totalmente offline. Solo necesito tus superpoderes con javascript y el resto corre por mi cuenta.
+:::
+
+## {background-image="assets/agenda_slide.png" background-size="contain"}
+
+## Comenzando
+
+Habilita estas flags en `chrome://flags`:
+
+- Prompt API for Gemini Nano
+- Summarization API for Gemini Nano
+- Writer/Rewriter API for Gemini Nano
+
+. . .
+
+Luego actualiza **Optimization Guide On Device Model** en `chrome://components`.
+
+## Cambiando el Paradigma {background-gradient="linear-gradient(to bottom right, #2c3e50, #4ca1af)"}
+
+::: {style="display: flex; justify-content: space-around; align-items: center; margin-top: 40px;"}
+
+::: {style="opacity: 0.7; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px;"}
+<h3>IA Tradicional</h3>
+Usuario &rarr; Servidor &rarr; Respuesta
+:::
+
+::: {style="font-size: 2em;"}
+&rarr;
+:::
+
+::: {style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; border: 2px solid #4ca1af;"}
+<h3>Web AI</h3>
+Usuario &larr; **Navegador** &rarr; Modelo
+:::
+
+:::
+
+::: {style="margin-top: 40px;"}
+Descentralización de la Inteligencia Artificial.
+:::
+
+## ¿Por qué ejecutar IA en el navegador? {background-image="assets/privacy_shield_background_1764037863751.png" background-opacity="0.4"}
+
+<ul style="background: rgba(0,0,0,0.6); padding: 40px; border-radius: 15px;">
+  <li class="fragment"><strong>Privacidad:</strong> Los datos nunca salen del dispositivo.</li>
+  <li class="fragment"><strong>Latencia:</strong> Cero viajes de red.</li>
+  <li class="fragment"><strong>Costo:</strong> $0 costos de servidor.</li>
+  <li class="fragment"><strong>Offline:</strong> Funciona sin internet.</li>
+</ul>
+
+## Las Limitaciones
+
+- **Hardware:** Depende de la GPU/RAM del usuario.
+- **Tamaño de Descarga:** Modelos enormes (GBs).
+- **Batería:** Consumo energético alto.
+
+## El Espectro de Web AI
+
+::: {style="display:flex; gap:20px;"}
+
+::: {style="flex:1; border:1px solid #555; padding:20px; border-radius: 10px; background: rgba(255,255,255,0.05);"}
+<h3>BYOM</h3>
+Bring Your Own Model
+
+<small>Tú envías el modelo (MediaPipe)</small>
+:::
+
+::: {style="flex:1; border:1px solid #fff; padding:20px; border-radius: 10px; background: rgba(255,255,255,0.1);"}
+<h3>Built-in AI</h3>
+Gemini Nano
+
+<small>El navegador incluye el modelo</small>
+:::
+
+:::
+
+# Descripción General {background-image="assets/browser_brain_background_1764037882897.png" background-opacity="0.5"}
+
+<ul style="background: rgba(0,0,0,0.6); padding: 30px; border-radius: 15px; text-shadow: 1px 1px 2px #000;">
+  <li><strong>Modelo:</strong> Gemini Nano</li>
+  <li><strong>Distribución:</strong> Gestionado por Chrome</li>
+  <li><strong>Acceso:</strong> APIs de JavaScript simples</li>
+</ul>
+
+::: {.notes}
+Gemini Nano es el modelo que impulsa todo esto. Chrome lo gestiona, así que no tienen que preocuparse por la distribución.
+:::
+
+## La API de Prompt
+
+La "Navaja Suiza" de la IA Integrada.
+
+- Conversación libre
+- Sesiones con estado
+- Genial para chatbots y consultas generales
+
+::: {.notes}
+Es la API más versátil. Pueden usarla para casi cualquier tarea de texto a texto.
+:::
+
+## Paso 1: Verificar Disponibilidad
+
+```javascript
+// 1. Verificar disponibilidad
+const availability = await LanguageModel.availability();
+if (availability === 'no') return;
+console.log("Modelo disponible");
+```
+
+<div style="margin-top: 20px;">
+  <button id="btn-availability" onclick="runAvailabilityDemo()" class="demo-btn">Verificar Disponibilidad</button>
+  <div id="output-availability" style="margin-top: 10px; text-align: left; background: #333; padding: 10px; border-radius: 5px; min-height: 40px; font-family: monospace; white-space: pre-wrap;"></div>
+</div>
+
+::: {.notes}
+Siempre verifiquen disponibilidad. El usuario podría no tener el modelo descargado aún.
+:::
+
+## Paso 2: Crear Sesión
+
+```javascript
+// 2. Crear sesión (con monitor de descarga)
+const session = await LanguageModel.create({
+  expectedInputs: [{ type: 'text', languages: ['es'] }],
+  expectedOutputs: [{ type: 'text', languages: ['es'] }],
+  systemPrompt: "Eres un asistente útil.",
+  monitor(m) {
+    m.addEventListener('downloadprogress', (e) => {
+      console.log(`Descargado ${e.loaded * 100}%`);
+    });
+  }
+});
+```
+
+<div style="margin-top: 20px;">
+  <button id="btn-session" onclick="runSessionDemo()" class="demo-btn">Crear Sesión</button>
+  <div id="output-session" style="margin-top: 10px; text-align: left; background: #333; padding: 10px; border-radius: 5px; min-height: 40px; font-family: monospace; white-space: pre-wrap;"></div>
+</div>
+
+::: {.notes}
+La sesión mantiene el contexto de la conversación. También pueden monitorear el progreso de descarga aquí.
+:::
+
+## Paso 3: Generación (Streaming)
+
+```javascript
+// 3. Streaming
+const stream = session.promptStreaming("Explicame algo!");
+for await (const chunk of stream) {
+  console.log(chunk);
+}
+```
+
+<div style="margin-top: 20px;">
+  <button id="btn-streaming" onclick="runStreamingDemo()" class="demo-btn">Generar Respuesta</button>
+  <div id="output-streaming" style="margin-top: 10px; text-align: left; background: #333; padding: 10px; border-radius: 5px; min-height: 60px; max-height: 200px; overflow-y: auto; font-family: monospace; white-space: pre-wrap;"></div>
+</div>
+
+::: {.notes}
+Streaming es vital para la percepción de velocidad. No hagan esperar al usuario por toda la respuesta.
+:::
+
+## Demo: Prompt Playground
+
+<iframe src="../prompt-api-playground/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload></iframe>
+
+## Contando Tokens
+
+```javascript
+// The API that returns the token count for a prompt changed between Chrome Stable and Canary
+// and the method was renamed from `countPromptTokens(input)` to `measureInputUsage(input)`.
+// The code below ensures both cases are handled.
+if (session.countPromptTokens) {
+  cost = await session.countPromptTokens(value);
+} else if (session.measureInputUsage) {
+  cost = await session.measureInputUsage(value);
+}
+console.log(`Tokens: ${count}`);
+```
+
+<div style="margin-top: 20px;">
+  <textarea id="token-input" placeholder="Escribe algo aquí para contar tokens..." style="width: 80%; height: 100px; font-size: 18px; padding: 10px; background: #333; color: white; border: 1px solid #555;"></textarea>
+  <div id="token-count" style="margin-top: 10px; font-size: 24px; font-weight: bold;">Tokens: 0</div>
+</div>
+
+::: {.notes}
+Contar tokens es importante para gestionar el contexto y evitar límites.
+:::
+
+## API de Resumen
+
+Optimizada para condensar texto.
+
+- `tl;dr`
+- `teaser`
+- `headline`
+
+::: {.notes}
+Esta API es específica para resumir. Es más eficiente que usar la API de Prompt para esta tarea.
+:::
+
+## Paso 1: Disponibilidad
+
+<div>window.Sumarizer</div>
+
+
+
+```javascript
+const availability = await self.Summarizer.availability();
+if (availability === 'no') return;
+console.log("Modelo disponible");
+```
+
+<div style="margin-top: 20px;">
+  <button id="btn-sum-avail" onclick="runSummarizerAvailability()" class="demo-btn">Verificar</button>
+  <div id="output-sum-avail" style="margin-top: 10px; text-align: left; background: #333; padding: 10px; border-radius: 5px; min-height: 40px; font-family: monospace; white-space: pre-wrap;">Esperando...</div>
+</div>
+
+::: {.notes}
+El patrón es el mismo: verificar disponibilidad primero.
+:::
+
+
+
+## Paso 2: Crear Summarizer
+
+```javascript
+const summarizer = await self.Summarizer.create({
+  format: 'plain-text',
+  monitor(m) {
+    m.addEventListener('downloadprogress', (e) => {
+      console.log(`Descargado ${e.loaded * 100}%`);
+    });
+  }
+});
+```
+
+<div style="margin-top: 20px;">
+  <button id="btn-sum-create" onclick="runSummarizerCreation()" class="demo-btn">Crear Summarizer</button>
+  <div id="output-sum-create" style="margin-top: 10px; text-align: left; background: #333; padding: 10px; border-radius: 5px; min-height: 40px; font-family: monospace; white-space: pre-wrap;">Esperando...</div>
+</div>
+
+::: {.notes}
+Configuren el formato de salida y monitoreen la descarga si es necesario.
+:::
+
+## Paso 3: Resumir
+
+```javascript
+const text = document.getElementById('input-sum').value;
+const summary = await summarizer.summarize(text);
+console.log(summary);
+```
+
+<div style="margin-top: 20px;">
+  <textarea id="input-sum" class="demo-input" style="height: 100px;" placeholder="Pega un texto largo aquí para resumir...">Web AI es una nueva tecnología que permite ejecutar modelos de inteligencia artificial directamente en el navegador web. Esto ofrece beneficios significativos incluyendo privacidad, ya que los datos no salen del dispositivo, y latencia reducida puesto que no se requieren viajes al servidor. También habilita funcionalidad offline. Sin embargo, requiere descargar modelos grandes y puede ser intensivo en hardware.</textarea>
+  <button id="btn-sum-exec" onclick="runSummarizerExecution()" class="demo-btn">Resumir Texto</button>
+  <div id="output-sum-exec" style="margin-top: 10px; text-align: left; background: #333; padding: 10px; border-radius: 5px; min-height: 60px; font-family: monospace; white-space: pre-wrap; font-size: 20px;"></div>
+</div>
+
+::: {.notes}
+Simplemente pasen el texto y obtengan el resumen.
+:::
+
+## Demo: Summarization Playground
+
+<iframe src="../summarization-api-playground/dist/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload></iframe>
+
+### Paso 1: Disponibilidad (Detector) {class="bg-lang-detect"}
+
+::: {.split-layout .code-heavy .vertical}
+
+::: {.split-col .code-col}
+```javascript
+// Modern API: self.ai.languageDetector
+const capabilities = await self.ai.languageDetector.capabilities();
+
+if (capabilities.available === 'no') {
+  console.log("Modelo no disponible");
+  return;
+}
+
+console.log("Modelo disponible:", capabilities.available);
+```
+:::
+
+::: {.split-col .demo-col}
+
+<p style="font-size: 0.8em; opacity: 0.8; margin-bottom: 15px;">Verifica si tu navegador soporta la detección de idioma.</p>
+
+<button id="btn-lang-avail" class="demo-btn" onclick="runLangDetectAvailability()">
+  <span class="icon">⚡</span> Verificar Disponibilidad
+</button>
+
+<div id="output-lang-avail" class="demo-output">Esperando verificación...</div>
+:::
+
+::: {.notes}
+Antes de traducir o procesar, a menudo necesitamos saber el idioma.
+:::
+
+:::
+
+## Paso 2: Crear Detector {class="bg-lang-detect"}
+
+::: {.split-layout .code-heavy .vertical}
+
+::: {.split-col .code-col}
+```javascript
+// Modern API: self.ai.languageDetector
+const detector = await self.ai.languageDetector.create({
+  monitor(m) {
+    m.addEventListener('downloadprogress', (e) => {
+      console.log(`Descargado ${e.loaded * 100}%`);
+    });
+  }
+});
+```
+:::
+
+::: {.split-col .demo-col}
+<button id="btn-lang-create" class="demo-btn" onclick="runLangDetectCreation()">
+  <span class="icon">⚙️</span> Crear Detector
+</button>
+
+<div class="progress-container">
+  <div id="progress-lang-create" class="progress-bar"></div>
+</div>
+
+<div id="output-lang-create" class="demo-output">Esperando...</div>
+:::
+
+::: {.notes}
+Este modelo es mucho más pequeño y rápido de descargar que Gemini Nano.
+:::
+
+:::
+
+## Paso 3: Detectar Idioma {class="bg-lang-detect playground-slide"}
+
+::: {.split-layout .code-heavy .vertical}
+
+::: {.split-col .code-col}
+```javascript
+const results = await detector.detect(inputText);
+console.log(results);
+```
+:::
+
+::: {.split-col .demo-col}
+<input type="text" id="input-lang-exec" class="demo-input" value="Bonjour le monde" placeholder="Escribe algo...">
+<button id="btn-lang-exec" class="demo-btn" onclick="runLangDetectExecution()">
+  <span class="icon">🔍</span> Detectar
+</button>
+<div id="output-lang-exec" class="demo-output">El resultado aparecerá aquí...</div>
+:::
+
+::: {.notes}
+Devuelve una lista de idiomas probables con sus niveles de confianza.
+:::
+
+:::
+
+## Demo: Translation Playground
+
+<iframe src="../translation-language-detection-api-playground/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload></iframe>
+
+## Paso 1: Disponibilidad (Writer) {class="bg-writer"}
+
+::: {.split-layout .code-heavy .vertical}
+
+::: {.split-col .code-col}
+```javascript
+// Modern API: self.ai.writer
+const availability = await self.ai.writer.availability();
+
+if (availability === 'no') {
+  console.log("Modelo no disponible");
+  return;
+}
+
+console.log("Modelo disponible:", availability);
+```
+:::
+
+::: {.split-col .demo-col}
+<button id="btn-writer-avail" class="demo-btn" onclick="runWriterAvailability()">
+  <span class="icon">⚡</span> Verificar Disponibilidad
+</button>
+<div id="output-writer-avail" class="demo-output">Esperando...</div>
+:::
+
+::: {.notes}
+Ayuda a escribir, refinar y elaborar textos.
+:::
+
+:::
+
+## Paso 2: Crear Writer {class="bg-writer"}
+
+::: {.split-layout .code-heavy .vertical}
+
+::: {.split-col .code-col}
+```javascript
+// Modern API: self.ai.writer
+const writer = await self.ai.writer.create({
+  tone: 'formal',
+  monitor(m) {
+    m.addEventListener('downloadprogress', (e) => {
+      console.log(`Descargado ${e.loaded * 100}%`);
+    });
+  }
+});
+```
+:::
+
+::: {.split-col .demo-col}
+<button id="btn-writer-create" class="demo-btn" onclick="runWriterCreation()">
+  <span class="icon">⚙️</span> Crear Writer
+</button>
+<div class="progress-container">
+  <div id="progress-writer-create" class="progress-bar"></div>
+</div>
+<div id="output-writer-create" class="demo-output">Esperando...</div>
+:::
+
+::: {.notes}
+Pueden configurar el tono (formal, casual) y la longitud.
+:::
+
+:::
+
+## Paso 3: Escribir {class="bg-writer playground-slide"}
+
+::: {.split-layout .code-heavy .vertical}
+
+::: {.split-col .code-col}
+```javascript
+const stream = await writer.writeStreaming(inputText);
+for await (const chunk of stream) {
+  console.log(chunk);
+}
+```
+:::
+
+::: {.split-col .demo-col}
+<textarea id="input-writer-exec" class="demo-input" style="height: 80px;" placeholder="Escribe tu prompt aquí...">Un correo para pedir vacaciones.</textarea>
+<button id="btn-writer-exec" class="demo-btn" onclick="runWriterExecution()">
+  <span class="icon">✍️</span> Escribir
+</button>
+<div id="output-writer-exec" class="demo-output">El resultado aparecerá aquí...</div>
+:::
+
+::: {.notes}
+Generación de contenido basada en el prompt del usuario.
+:::
+
+:::
+
+## Demo: Writer Playground
+
+<iframe src="../writer-rewriter-api-playground/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload></iframe>
+
+## Paso 1: Disponibilidad (Rewriter) {class="bg-rewriter"}
+
+::: {.split-layout .code-heavy .vertical}
+
+::: {.split-col .code-col}
+```javascript
+// Modern API: self.ai.rewriter
+const availability = await self.ai.rewriter.availability();
+
+if (availability === 'no') {
+  console.log("Modelo no disponible");
+  return;
+}
+
+console.log("Modelo disponible:", availability);
+```
+:::
+
+::: {.split-col .demo-col}
+<button id="btn-rewriter-avail" class="demo-btn" onclick="runRewriterAvailability()">
+  <span class="icon">⚡</span> Verificar Disponibilidad
+</button>
+<div id="output-rewriter-avail" class="demo-output">Esperando...</div>
+:::
+
+::: {.notes}
+Refinar textos existentes es un caso de uso enorme.
+:::
+
+:::
+
+## Paso 2: Crear Rewriter {class="bg-rewriter"}
+
+Diferencia: `self.Rewriter` vs `self.Writer`
+
+::: {.split-layout .code-heavy .vertical}
+
+::: {.split-col .code-col}
+```javascript
+// Modern API: self.ai.rewriter
+const rewriter = await self.ai.rewriter.create({
+  tone: 'more-formal',
+  length: 'shorter',
+  monitor(m) {
+    m.addEventListener('downloadprogress', (e) => {
+      console.log(`Descargado ${e.loaded * 100}%`);
+    });
+  }
+});
+```
+:::
+
+::: {.split-col .demo-col}
+<button id="btn-rewriter-create" class="demo-btn" onclick="runRewriterCreation()">
+  <span class="icon">⚙️</span> Crear Rewriter
+</button>
+<div class="progress-container">
+  <div id="progress-rewriter-create" class="progress-bar"></div>
+</div>
+<div id="output-rewriter-create" class="demo-output">Esperando...</div>
+:::
+
+::: {.notes}
+Similar al Writer, pero optimizado para tomar un texto de entrada y transformarlo.
+:::
+
+:::
+
+## Paso 3: Reescribir {class="bg-rewriter playground-slide"}
+
+::: {.split-layout .code-heavy .vertical}
+
+::: {.split-col .code-col}
+```javascript
+const stream = await rewriter.rewriteStreaming(
+  inputText, 
+  { context: contextText }
+);
+
+for await (const chunk of stream) {
+  console.log(chunk);
+}
+```
+:::
+
+::: {.split-col .demo-col}
+<textarea id="input-rewriter-exec" class="demo-input" style="height: 60px;" placeholder="Texto a reescribir...">Hola jefe, quiero vacaciones.</textarea>
+<input type="text" id="context-rewriter-exec" class="demo-input" value="Correo formal" placeholder="Contexto (ej. Correo formal)">
+<button id="btn-rewriter-exec" class="demo-btn" onclick="runRewriterExecution()">
+  <span class="icon">✍️</span> Reescribir
+</button>
+<div id="output-rewriter-exec" class="demo-output">El resultado aparecerá aquí...</div>
+:::
+
+::: {.notes}
+Transformación de texto con contexto opcional.
+:::
+
+:::
+
+# Descripción General BYOM {class="bg-byom"}
+
+<ul style="background: rgba(0,0,0,0.6); padding: 40px; border-radius: 15px;">
+  <li><strong>Uso:</strong> Soporte cross-browser, modelos específicos.</li>
+  <li><strong>Stack:</strong> WebGPU + WebAssembly.</li>
+  <li><strong>Librería:</strong> Google MediaPipe.</li>
+</ul>
+
+::: {.notes}
+Para control total, privacidad absoluta o modelos específicos que no están en Chrome.
+:::
+
+## MediaPipe LLM Inference API {class="bg-byom"}
+
+Ejecuta LLMs completamente en el dispositivo.
+
+- **Tareas:** Generación de texto, recuperación de información, resúmenes.
+- **Modelos:** Gemma 2B, Gemma-3n (Multimodal: Texto, Imagen, Audio).
+- **Privacidad:** Todo sucede en el cliente.
+
+::: {.notes}
+La API de LLM Inference te permite ejecutar modelos de lenguaje grandes (LLM) completamente en el dispositivo. Compatible con Gemma-3n para entradas de imagen y audio.
+:::
+
+## Configuración Rápida {class="bg-byom"}
+
+1. **Instalar:**
+   ```bash
+   npm install @mediapipe/tasks-genai
+   ```
+2. **Descargar Modelo:**
+   - Gemma-3n E4B o E2B (versiones "-Web").
+   - [Hugging Face Community](https://huggingface.co/google)
+
+::: {.notes}
+Usa modelos convertidos específicamente para la Web (terminan en .litertlm o .bin según la versión).
+:::
+
+## Inicialización {class="bg-byom"}
+
+```javascript
+const genai = await FilesetResolver.forGenAiTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@latest/wasm"
+);
+
+const llm = await LlmInference.createFromOptions(genai, {
+    baseOptions: { modelAssetPath: '/assets/gemma-3n-E4B-it-int4-Web.litertlm' },
+    maxTokens: 1000,
+    topK: 40,
+    temperature: 0.8
+});
+
+const response = await llm.generateResponse(inputPrompt);
+```
+
+## Multimodalidad (Gemma-3n) {class="bg-byom"}
+
+Soporte para Imágenes y Audio.
+
+```javascript
+const llm = await LlmInference.createFromOptions(genai, {
+    // ...
+    maxNumImages: 5,
+    supportAudio: true,
+});
+
+const response = await llm.generateResponse([
+  'Describe ',
+  {imageSource: '/assets/test_image.png'},
+  ' and transcribe ',
+  {audioSource: '/assets/test_audio.wav'}
+]);
+```
+
+## Personalización con LoRA {class="bg-byom"}
+
+Adaptación eficiente de modelos (Low-Rank Adaptation).
+
+- Entrena pesos pequeños en tus datos.
+- Carga dinámica en tiempo de ejecución.
+
+```javascript
+// Configuración
+loraRanks: [4, 8, 16]
+
+// Carga y Uso
+const loraModel = await llm.loadLoraModel(loraModelUrl);
+llm.generateResponse(prompt, loraModel, callback);
+```
+
+## Cargando el Modelo (Worker) {class="bg-byom"}
+
+::: {.split-layout .code-heavy .vertical}
+
+::: {.split-col .code-col}
+```javascript
+// perf-worker-gemma/src/worker.js
+import { LlmInference, FilesetResolver } from '@mediapipe/tasks-genai';
+
+const genai = await FilesetResolver.forGenAiTasks(wasmPath);
+const llm = await LlmInference.createFromModelPath(genai, modelUrl);
+self.postMessage({ status: 'READY' });
+```
+:::
+
+::: {.split-col .demo-col style="justify-content: center;"}
+**Clave:** ¡Haz esto en un Web Worker!
+
+<p style="font-size: 0.8em; opacity: 0.8;">Evita bloquear el hilo principal durante la carga pesada del modelo.</p>
+:::
+
+::: {.notes}
+Archivos grandes (2GB+). Bloquearían el navegador si no se hacen en un Worker.
+:::
+
+:::
+
+## Ejecutando Inferencia {class="bg-byom"}
+
+::: {.split-layout .code-heavy .vertical}
+
+::: {.split-col .code-col}
+```javascript
+const response = await llm.generateResponse(userPrompt);
+self.postMessage({ text: response });
+```
+:::
+
+::: {.split-col .demo-col style="justify-content: center;"}
+`generateResponse` es síncrono y pesado.
+
+<p style="font-size: 0.8em; opacity: 0.8;">Si se ejecuta en el hilo principal, la página se congelará por completo.</p>
+:::
+
+::: {.notes}
+Cálculo intensivo. De nuevo, Worker es obligatorio.
+:::
+
+:::
+
+## La Regla de Oro {class="bg-byom"}
+
+::: {.split-layout .vertical-center}
+
+::: {.split-col style="flex: 1;"}
+<h3>NUNCA ejecutes inferencia en el Hilo Principal.</h3>
+<p>Congela la UI.</p>
+<h3>SIEMPRE usa un Web Worker.</h3>
+:::
+
+::: {.split-col style="flex: 1; display: flex; justify-content: center; align-items: center;"}
+![](assets/main_thread_vs_worker.png){width="100%" style="border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);"}
+:::
+
+:::
+
+::: {.notes}
+Si recuerdan una cosa de hoy: NUNCA ejecuten inferencia en el hilo principal.
+:::
+
+## Demo: Worker vs No-Worker
+
+<iframe src="../perf-worker-gemma/dist/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload></iframe>
+
+# Respuestas en Streaming (SSE) {class="bg-advanced"}
+
+No esperes la respuesta completa.
+
+Transmite tokens a medida que se generan.
+
+<div style="font-size: 3em; margin-top: 20px;">🌊 ➡️ 📄</div>
+
+::: {.notes}
+UX percibida es todo. El usuario siente que "piensa" rápido.
+:::
+
+## Ejemplo Streaming Node.js {class="bg-advanced"}
+
+::: {.split-layout .code-heavy .vertical}
+
+::: {.split-col .code-col}
+```javascript
+// gemini-node-sse/index.js
+const result = await model.generateContentStream(prompt);
+for await (const chunk of result.stream) {
+    res.write(`data: ${JSON.stringify(chunk.text())}\n\n`);
+}
+```
+:::
+
+::: {.split-col .demo-col style="justify-content: center;"}
+Server-Sent Events (SSE) permite enviar actualizaciones en tiempo real al cliente.
+:::
+
+::: {.notes}
+El backend también puede hacer streaming. Server-Sent Events es perfecto para esto.
+:::
+
+:::
+
+## Gestionando Contexto
+
+<ul style="background: rgba(0,0,0,0.3); padding: 30px; border-radius: 15px; list-style: none;">
+  <li>🧠 <strong>RAM Limitada:</strong> 4k-8k tokens en móviles.</li>
+  <li>✂️ <strong>Truncado:</strong> Corta el historial agresivamente.</li>
+  <li>🎯 <strong>System Prompts:</strong> Úsalos para definir comportamiento eficientemente.</li>
+</ul>
+
+::: {.notes}
+Ventana de contexto limitada en móviles. Sean inteligentes con lo que envían.
+:::
+
+## Prompting One-Shot {class="bg-advanced"}
+
+¡Dale un ejemplo al modelo!
+
+::: {.comparison-box}
+
+::: {.comparison-item .bad}
+**❌ Mal:** "Clasifica esta reseña."
+:::
+
+::: {.comparison-item .good}
+**✅ Bien:** "Clasifica como Positiva/Negativa. <br>Ejemplo: '¡Me encanta!' -> Positiva.
+<br>Ahora clasifica: 'Lo odié.'"
+:::
+
+::: {.notes}
+Ejemplos ayudan mucho al modelo a entender el formato y tono deseado.
+:::
+
+:::
+
+## {background-image="assets/arquitectura_hibrida.jpeg" background-size="contain"}
+
+::: {.notes}
+Lo mejor de dos mundos. Rápido y privado para lo simple. Potente y capaz para lo complejo.
+:::
+
+## Demo del Mundo Real {class="bg-advanced"}
+
+#### Reseñas de Productos
+
+::: {style="background: rgba(0,0,0,0.3); padding: 30px; border-radius: 15px;"}
+1. 👤 Usuario escribe reseña.
+2. 🛡️ **Local:** Verificar toxicidad (Transformers.js).
+3. ✨ **Local:** Sugerir mejoras (Gemma).
+:::
+
+::: {.notes}
+Un flujo completo: Local para inmediatez, Nube para potencia si es necesario.
+:::
+
+## Demo: Product Reviews
+
+<iframe src="../product-review-suggestions/src/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload></iframe>
+
+
+## Soporte del Navegador {class="bg-advanced"}
+
+<div style="display: flex; gap: 40px; justify-content: center; align-items: stretch; margin-top: 50px;">
+<div style="flex: 1; background: rgba(255, 255, 255, 0.05); padding: 40px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);">
+<div style="font-size: 3em; margin-bottom: 20px;">🤖</div>
+<h3 style="margin-top: 0; color: #a8dadc;">Built-in AI</h3>
+<p style="font-size: 1.2em; margin: 10px 0;">Chrome Desktop</p>
+<div style="background: rgba(255, 215, 0, 0.2); color: #ffd700; padding: 5px 15px; border-radius: 20px; font-size: 0.8em; font-weight: bold; display: inline-block;">Canary / Dev</div>
+</div>
+<div style="flex: 1; background: rgba(255, 255, 255, 0.05); padding: 40px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);">
+<div style="font-size: 3em; margin-bottom: 20px;">⚡</div>
+<h3 style="margin-top: 0; color: #a8dadc;">BYOM (WebGPU)</h3>
+<p style="font-size: 1.2em; margin: 10px 0;">Chrome, Edge, Firefox</p>
+<div style="background: rgba(0, 255, 127, 0.2); color: #00ff7f; padding: 5px 15px; border-radius: 20px; font-size: 0.8em; font-weight: bold; display: inline-block;">Broad Support</div>
+</div>
+</div>
+
+::: {.notes}
+El soporte está creciendo. Chrome lidera con Built-in AI, pero WebGPU (la base de BYOM) ya está en todos los navegadores modernos.
+:::
+
+## Recursos {class="bg-advanced"}
+
+::: {style="font-size: 0.8em;"}
+- 📦 `github.com/GoogleChromeLabs/web-ai-demos`
+- 📚 `developer.chrome.com/docs/ai`
+- 🤖 `ai.google.dev/edge/mediapipe`
+:::
+
+::: {.notes}
+Aquí tienen los enlaces al repo con todos estos demos y la documentación oficial.
+:::
+
+## {background-gradient="linear-gradient(to bottom right, #ff9966, #ff5e62)"}
+
+<img src="assets/WebGDE Avatar.png" style="width: 150px; height: 150px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); margin-bottom: 20px;">
+<p style="font-size: 1.5em;">@sebasgojs</p>
+<p style="font-size: 1.5em;">sebastian-gomez.com</p>
+<p style="font-size: 1.5em;">youtube.com/@sebasgojs</p>
+<p style="margin-top: 50px;"><small>Ve y construye algo mágico. ✨</small></p>
+
+::: {.notes}
+¡Gracias por su tiempo! Estoy abierto a preguntas. ¡Vayan y construyan algo increíble con Web AI!
+:::

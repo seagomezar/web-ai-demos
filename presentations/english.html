@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Web AI: The Next Frontier</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/black.css" id="theme">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai.min.css">
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+
+        <!-- Slide 1 -->
+        <section>
+          <h1>Web AI: The Next Frontier</h1>
+          <h3>Unlocking the Power of Gemini Nano & Client-Side Intelligence</h3>
+          <p>
+            <small>Presented by [Your Name]</small>
+          </p>
+          <aside class="notes">
+            Hello everyone, thank you for joining me today. We're standing at the edge of a significant shift in how we build intelligent web applications.
+          </aside>
+        </section>
+
+        <!-- Slide 2 -->
+        <section>
+          <h2>Today's Journey</h2>
+          <ol>
+            <li>Defining Web AI</li>
+            <li>The Two Approaches: BYOM vs. Built-in</li>
+            <li><strong>Deep Dive: The Prompt API</strong></li>
+            <li><strong>Deep Dive: Task-Specific APIs</strong></li>
+            <li><strong>Deep Dive: BYOM with MediaPipe</strong></li>
+            <li>Performance Patterns</li>
+            <li>Real-world Demos & Roadmap</li>
+          </ol>
+        </section>
+
+        <!-- Slide 3 -->
+        <section>
+          <h2>Getting Started</h2>
+          <p>Enable these flags in <code>chrome://flags</code>:</p>
+          <ul>
+            <li>Prompt API for Gemini Nano</li>
+            <li>Summarization API for Gemini Nano</li>
+            <li>Writer/Rewriter API for Gemini Nano</li>
+          </ul>
+          <p class="fragment">Then update <strong>Optimization Guide On Device Model</strong> in <code>chrome://components</code>.</p>
+        </section>
+
+        <!-- Slide 4 -->
+        <section>
+          <h2>Shifting the Paradigm</h2>
+          <div style="display: flex; justify-content: space-around;">
+            <div style="opacity: 0.5;">
+              <h3>Traditional AI</h3>
+              <p>User &rarr; Cloud Server &rarr; Response</p>
+            </div>
+            <div>
+              <h3>Web AI</h3>
+              <p>User &larr; <strong>Browser</strong> &rarr; Model</p>
+            </div>
+          </div>
+          <p><strong>Key Concept:</strong> Decentralizing Intelligence.</p>
+        </section>
+
+        <!-- Slide 5 -->
+        <section>
+          <h2>Why Run AI in the Browser?</h2>
+          <ul>
+            <li class="fragment"><strong>Privacy:</strong> Data never leaves the device.</li>
+            <li class="fragment"><strong>Latency:</strong> Zero network round-trips.</li>
+            <li class="fragment"><strong>Cost:</strong> $0 server inference costs.</li>
+            <li class="fragment"><strong>Offline:</strong> Works without internet.</li>
+          </ul>
+        </section>
+
+        <!-- Slide 6 -->
+        <section>
+          <h2>The Constraints</h2>
+          <ul>
+            <li><strong>Hardware:</strong> Dependent on user's GPU/RAM.</li>
+            <li><strong>Download Size:</strong> Models are huge (GBs).</li>
+            <li><strong>Battery:</strong> Intensive math burns power.</li>
+          </ul>
+        </section>
+
+        <!-- Slide 7 -->
+        <section>
+          <h2>The Spectrum of Web AI</h2>
+          <div style="display:flex; gap:20px;">
+            <div style="flex:1; border:1px solid #555; padding:20px;">
+              <h3>BYOM</h3>
+              <p>Bring Your Own Model</p>
+              <small>Ship WASM/Weights (MediaPipe)</small>
+            </div>
+            <div style="flex:1; border:1px solid #fff; padding:20px;">
+              <h3>Built-in AI</h3>
+              <p>Gemini Nano</p>
+              <small>Browser manages the model</small>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 1 -->
+        <section>
+          <h1>Section 1</h1>
+          <h3>Chrome Built-in AI</h3>
+        </section>
+
+        <!-- Slide 8 -->
+        <section>
+          <h2>Built-in AI Overview</h2>
+          <ul>
+            <li><strong>Model:</strong> Gemini Nano</li>
+            <li><strong>Distribution:</strong> Managed by Chrome</li>
+            <li><strong>Access:</strong> Simple JavaScript APIs</li>
+          </ul>
+        </section>
+
+        <!-- Slide 9 -->
+        <section>
+          <h2>The Prompt API</h2>
+          <p>The "Swiss Army Knife" of Built-in AI.</p>
+          <ul>
+            <li>Freeform conversation</li>
+            <li>Stateful sessions</li>
+            <li>Great for chatbots & generic queries</li>
+          </ul>
+        </section>
+
+        <!-- Slide 10 -->
+        <section>
+          <h2>Coding with Prompt API</h2>
+          <pre><code class="javascript" data-trim data-noescape>
+// 1. Check availability
+const capabilities = await LanguageModel.capabilities();
+if (capabilities.available === 'no') return;
+
+// 2. Create session (with download monitor)
+const session = await LanguageModel.create({
+  systemPrompt: "You are a helpful assistant.",
+  monitor(m) {
+    m.addEventListener('downloadprogress', (e) => {
+      console.log(`Downloaded ${e.loaded * 100}%`);
+    });
+  }
+});
+
+// 3. Stream response
+const stream = session.promptStreaming("Explain quantum computing.");
+for await (const chunk of stream) {
+  console.log(chunk);
+}
+          </code></pre>
+          <div style="margin-top: 20px;">
+            <button onclick="runPromptDemo()" style="font-size: 20px; padding: 10px 20px; cursor: pointer;">Run Code</button>
+            <div id="prompt-output" style="margin-top: 10px; text-align: left; background: #333; padding: 10px; border-radius: 5px; min-height: 60px; font-family: monospace; white-space: pre-wrap;">Output will appear here...</div>
+          </div>
+        </section>
+
+        <!-- Slide 11 -->
+        <section>
+          <h2>Demo: Prompt Playground</h2>
+          <p><em>(Switch to prompt-api-playground demo)</em></p>
+          <p>Notice the token counter increasing in real-time.</p>
+        </section>
+
+        <!-- Slide 12 -->
+        <section>
+          <h2>Summarization API</h2>
+          <p>Task-Specific API optimized for condensing text.</p>
+          <ul>
+            <li><code>tl;dr</code></li>
+            <li><code>teaser</code></li>
+            <li><code>headline</code></li>
+          </ul>
+        </section>
+
+        <!-- Slide 13 -->
+        <section>
+          <h2>Coding the Summarizer</h2>
+          <pre><code class="javascript" data-trim data-noescape>
+const options = { type: 'tl;dr', format: 'plain-text' };
+
+const availability = await Summarizer.capabilities();
+if (availability.available === 'no') return;
+
+// Create with download monitor
+const summarizer = await Summarizer.create({
+  ...options,
+  monitor(m) {
+    m.addEventListener('downloadprogress', (e) => {
+      console.log(`Downloaded ${e.loaded * 100}%`);
+    });
+  }
+});
+
+const summary = await summarizer.summarize(longText);
+          </code></pre>
+           <div style="margin-top: 20px;">
+            <button onclick="runSummarizerDemo()" style="font-size: 20px; padding: 10px 20px; cursor: pointer;">Run Code</button>
+            <div id="summarizer-output" style="margin-top: 10px; text-align: left; background: #333; padding: 10px; border-radius: 5px; min-height: 60px; font-family: monospace; white-space: pre-wrap;">Output will appear here...</div>
+          </div>
+        </section>
+
+        <!-- Slide 14 -->
+        <section>
+          <h2>Demo: Summarizer</h2>
+          <p><em>(Switch to summarization-api-playground demo)</em></p>
+          <p>Generating a TL;DR from a Wikipedia article.</p>
+        </section>
+
+        <!-- Slide 15 -->
+        <section>
+          <h2>Language Detection API</h2>
+          <p>Instant, local language identification.</p>
+          <pre><code class="javascript">
+const detector = await LanguageDetector.create();
+const results = await detector.detect("Bonjour le monde");
+// results[0].detectedLanguage === 'fr'
+          </code></pre>
+          <div style="margin-top: 20px;">
+            <button onclick="runLangDetectDemo()" style="font-size: 20px; padding: 10px 20px; cursor: pointer;">Run Code</button>
+            <div id="lang-output" style="margin-top: 10px; text-align: left; background: #333; padding: 10px; border-radius: 5px; min-height: 40px; font-family: monospace; white-space: pre-wrap;">Output will appear here...</div>
+          </div>
+        </section>
+
+        <!-- Slide 16 -->
+        <section>
+          <h2>Writer & Rewriter APIs</h2>
+          <p>Monitoring Downloads</p>
+          <pre><code class="javascript" data-trim data-noescape>
+const writer = await Writer.create({
+  tone: 'formal',
+  monitor(m) {
+    m.addEventListener('downloadprogress', (e) => {
+      console.log(`Downloaded ${e.loaded * 100}%`);
+    });
+  }
+});
+          </code></pre>
+        </section>
+
+        <!-- SECTION 2 -->
+        <section>
+          <h1>Section 2</h1>
+          <h3>Bring Your Own Model (BYOM)</h3>
+        </section>
+
+        <!-- Slide 17 -->
+        <section>
+          <h2>BYOM Overview</h2>
+          <ul>
+            <li><strong>Use Case:</strong> Cross-browser support, specific models.</li>
+            <li><strong>Tech Stack:</strong> WebGPU + WebAssembly.</li>
+            <li><strong>Library:</strong> Google MediaPipe.</li>
+          </ul>
+        </section>
+
+        <!-- Slide 18 -->
+        <section>
+          <h2>MediaPipe & Gemma</h2>
+          <p>Running Gemma 2B entirely client-side.</p>
+          <p>See project: <code>perf-worker-gemma</code></p>
+        </section>
+
+        <!-- Slide 19 -->
+        <section>
+          <h2>Loading the Model (Worker)</h2>
+          <pre><code class="javascript" data-trim data-noescape>
+// perf-worker-gemma/src/worker.js
+import { LlmInference, FilesetResolver } from '@mediapipe/tasks-genai';
+
+const genai = await FilesetResolver.forGenAiTasks(wasmPath);
+const llm = await LlmInference.createFromModelPath(genai, modelUrl);
+self.postMessage({ status: 'READY' });
+          </code></pre>
+          <p><strong>Key:</strong> Do this in a Web Worker!</p>
+        </section>
+
+        <!-- Slide 20 -->
+        <section>
+          <h2>Running Inference</h2>
+          <pre><code class="javascript">
+const response = await llm.generateResponse(userPrompt);
+self.postMessage({ text: response });
+          </code></pre>
+          <p><code>generateResponse</code> is synchronous and CPU heavy.</p>
+        </section>
+
+        <!-- Slide 21 -->
+        <section>
+          <h2 style="color: #ff5555;">The Golden Rule</h2>
+          <h3>NEVER run inference on the Main Thread.</h3>
+          <p>It freezes the UI.</p>
+          <h3>ALWAYS use a Web Worker.</h3>
+        </section>
+
+        <!-- Slide 22 -->
+        <section>
+          <h2>Demo: Worker vs No-Worker</h2>
+          <div style="display:flex;">
+            <div style="flex:1;">
+              <h4>No Worker</h4>
+              <p>UI Freezes 🥶</p>
+            </div>
+            <div style="flex:1;">
+              <h4>Worker</h4>
+              <p>UI Smooth 🚀</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 3 -->
+        <section>
+          <h1>Section 3</h1>
+          <h3>Advanced Patterns</h3>
+        </section>
+
+        <!-- Slide 23 -->
+        <section>
+          <h2>Streaming Responses (SSE)</h2>
+          <p>Don't wait for the full response.</p>
+          <p>Stream tokens as they generate.</p>
+        </section>
+
+        <!-- Slide 24 -->
+        <section>
+          <h2>Node.js Streaming Example</h2>
+          <pre><code class="javascript">
+// gemini-node-sse/index.js
+const result = await model.generateContentStream(prompt);
+for await (const chunk of result.stream) {
+    res.write(`data: ${JSON.stringify(chunk.text())}\n\n`);
+}
+          </code></pre>
+        </section>
+
+        <!-- Slide 25 -->
+        <section>
+          <h2>Managing Context</h2>
+          <ul>
+            <li>Mobile RAM is limited (4k-8k tokens).</li>
+            <li>Truncate old history aggressively.</li>
+            <li>Use <strong>System Prompts</strong> to set rules efficiently.</li>
+          </ul>
+        </section>
+
+        <!-- Slide 26 -->
+        <section>
+          <h2>One-Shot Prompting</h2>
+          <p>Give the model an example!</p>
+          <div style="text-align:left; background:#333; padding:15px; border-radius:10px;">
+            <p><strong>Bad:</strong> "Classify this review."</p>
+            <p><strong>Good:</strong> "Classify reviews as Positive/Negative. <br>Example: 'Love it!' -> Positive. <br>Now classify: 'Hated it.'"</p>
+          </div>
+        </section>
+
+        <!-- Slide 27 -->
+        <section>
+          <h2>Hybrid Architecture</h2>
+          <div style="display:flex; gap:20px;">
+            <div style="flex:1; background:#222; padding:10px;">
+              <h4>Local (Nano)</h4>
+              <p>Fast, Private, Drafting</p>
+            </div>
+            <div style="flex:1; background:#444; padding:10px;">
+              <h4>Cloud (Pro)</h4>
+              <p>Heavy reasoning, Huge context</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 28 -->
+        <section>
+          <h2>Real World Demo</h2>
+          <h3>Product Reviews</h3>
+          <ol>
+            <li>User types review.</li>
+            <li><strong>Local:</strong> Check toxicity (Transformers.js).</li>
+            <li><strong>Local:</strong> Suggest improvements (Gemma).</li>
+          </ol>
+        </section>
+
+        <!-- Slide 29 -->
+        <section>
+          <h2>Browser Support</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Technology</th>
+                <th>Support</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Built-in AI</td>
+                <td>Chrome Desktop (Canary/Dev)</td>
+              </tr>
+              <tr>
+                <td>BYOM (WebGPU)</td>
+                <td>Chrome, Edge, Firefox Nightly</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Slide 30 -->
+        <section>
+          <h2>Resources</h2>
+          <ul>
+            <li><code>github.com/GoogleChromeLabs/web-ai-demos</code></li>
+            <li><code>developer.chrome.com/docs/ai</code></li>
+            <li><code>ai.google.dev/edge/mediapipe</code></li>
+          </ul>
+        </section>
+
+        <!-- Slide 31 -->
+        <section>
+          <h1>Thank You!</h1>
+          <p>Questions?</p>
+          <p><small>Go build something magical.</small></p>
+        </section>
+
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+    <script>
+      Reveal.initialize({
+        hash: true,
+        plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+      });
+
+      // --- Demo Scripts ---
+
+      async function runPromptDemo() {
+        const output = document.getElementById('prompt-output');
+        output.textContent = "Checking availability...";
+        
+        try {
+          if (!self.LanguageModel) {
+            output.textContent = "Error: window.LanguageModel is not available. \nMake sure you are in Chrome Canary/Dev and have enabled the 'Prompt API for Gemini Nano' flag.";
+            return;
+          }
+
+          const capabilities = await self.LanguageModel.capabilities();
+          if (capabilities.available === 'no') {
+             output.textContent = "Error: Model available state is 'no'.";
+             return;
+          }
+
+          output.textContent = "Creating session... (This might take a moment)";
+          
+          const session = await self.LanguageModel.create({
+            systemPrompt: "You are a helpful assistant. Answer concisely.",
+            monitor(m) {
+              m.addEventListener('downloadprogress', (e) => {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                output.textContent = `Downloading model: ${percent}%`;
+              });
+            }
+          });
+
+          output.textContent = "Model Ready. Generating response...";
+          
+          const stream = session.promptStreaming("Explain quantum computing in one sentence.");
+          
+          let firstChunk = true;
+          for await (const chunk of stream) {
+            if (firstChunk) {
+              output.textContent = "";
+              firstChunk = false;
+            }
+            output.textContent = chunk;
+          }
+          
+        } catch (e) {
+          output.textContent = "Error: " + e.message;
+        }
+      }
+
+      async function runSummarizerDemo() {
+        const output = document.getElementById('summarizer-output');
+        output.textContent = "Checking availability...";
+
+        try {
+           if (!self.Summarizer) {
+            output.textContent = "Error: window.Summarizer is not available. \nMake sure you have enabled the 'Summarization API for Gemini Nano' flag.";
+            return;
+          }
+          
+          const capabilities = await self.Summarizer.capabilities();
+          if (capabilities.available === 'no') {
+             output.textContent = "Error: Model available state is 'no'.";
+             return;
+          }
+
+          output.textContent = "Creating summarizer...";
+          
+          const summarizer = await self.Summarizer.create({ 
+            type: 'tl;dr', 
+            format: 'plain-text',
+            monitor(m) {
+              m.addEventListener('downloadprogress', (e) => {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                output.textContent = `Downloading model: ${percent}%`;
+              });
+            }
+          });
+
+          output.textContent = "Summarizing...";
+
+          const longText = "Web AI is a new technology that allows artificial intelligence models to run directly in the web browser. This offers significant benefits including privacy, as data does not leave the device, and reduced latency since no server round-trips are required. It also enables offline functionality. However, it requires downloading large models and can be hardware intensive.";
+          
+          const summary = await summarizer.summarize(longText);
+          output.textContent = "Summary: " + summary;
+
+        } catch (e) {
+           output.textContent = "Error: " + e.message;
+        }
+      }
+
+      async function runLangDetectDemo() {
+        const output = document.getElementById('lang-output');
+        output.textContent = "Checking availability...";
+
+        try {
+           if (!self.LanguageDetector) {
+            output.textContent = "Error: window.LanguageDetector is not available. \nMake sure you have enabled the 'Language Detection API' flag.";
+            return;
+          }
+          
+          output.textContent = "Creating detector (this may download a model)...";
+
+          const detector = await self.LanguageDetector.create();
+          
+          output.textContent = "Detecting language...";
+          const results = await detector.detect("Bonjour le monde");
+          
+          output.textContent = JSON.stringify(results, null, 2);
+
+        } catch (e) {
+           output.textContent = "Error: " + e.message;
+        }
+      }
+
+    </script>
+  </body>
+</html>

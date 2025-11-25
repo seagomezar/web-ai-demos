@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web AI: La Próxima Frontera</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0a0a12;
+            --text-color: #e0e0e0;
+            --accent-cyan: #00f3ff;
+            --accent-purple: #bc13fe;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Background Animation */
+        .background-fx {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0a0a12 100%);
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-purple);
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-cyan);
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(30px, 50px);
+            }
+        }
+
+        /* Slide Engine */
+        .slides-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        /* Typography & Components */
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 0.5em;
+            background: linear-gradient(to right, #fff, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1em;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            color: var(--accent-purple);
+            margin-bottom: 0.5em;
+        }
+
+        p,
+        li {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        button {
+            background: linear-gradient(45deg, var(--accent-purple), var(--accent-cyan));
+            border: none;
+            padding: 15px 30px;
+            color: white;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        pre {
+            background: #1e1e2e;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            overflow-x: auto;
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid var(--glass-border);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            color: #a9b7c6;
+        }
+
+        .output-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 800px;
+            min-height: 60px;
+            text-align: left;
+            font-family: var(--font-mono);
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Navigation Controls */
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            padding: 0;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Specific Layouts */
+        .layout-split {
+            display: flex;
+            gap: 40px;
+            width: 90%;
+            max-width: 1400px;
+            justify-content: center;
+            align-items: center;
+            height: 80%;
+        }
+
+        .split-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            width: 80%;
+            max-width: 1200px;
+        }
+
+        .grid-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: left;
+            transition: transform 0.3s;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            max-width: 800px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: white;
+            padding: 15px;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="background-fx">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <div class="slides-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active" id="slide-1">
+            <h1>Web AI: La Próxima Frontera</h1>
+            <h3>Desbloqueando el poder de Gemini Nano</h3>
+            <p>Inteligencia en el Cliente</p>
+        </div>
+
+        <!-- Slide 2: Agenda -->
+        <div class="slide" id="slide-2">
+            <div class="glass-card">
+                <h2>El Viaje de Hoy</h2>
+                <ul style="text-align: left;">
+                    <li>Definiendo Web AI (IA Web)</li>
+                    <li>Los Dos Enfoques: BYOM vs. Built-in</li>
+                    <li><strong>Profundización: La API de Prompt</strong></li>
+                    <li>Demos en Vivo</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 3: Paradigm Shift -->
+        <div class="slide" id="slide-3">
+            <h2>Cambiando el Paradigma</h2>
+            <div class="layout-split">
+                <div class="glass-card split-item" style="opacity: 0.6;">
+                    <h3>IA Tradicional</h3>
+                    <p>Usuario &rarr; Servidor &rarr; Respuesta</p>
+                </div>
+                <div class="glass-card split-item" style="border-color: var(--accent-cyan);">
+                    <h3 style="color: var(--accent-cyan);">Web AI</h3>
+                    <p>Usuario &larr; <strong>Navegador</strong> &rarr; Modelo</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Benefits -->
+        <div class="slide" id="slide-4">
+            <h2>¿Por qué ejecutar IA en el navegador?</h2>
+            <div class="layout-grid">
+                <div class="grid-item">🔒 <strong>Privacidad</strong><br>Los datos nunca salen del dispositivo.</div>
+                <div class="grid-item">⚡ <strong>Latencia</strong><br>Cero viajes de red.</div>
+                <div class="grid-item">💰 <strong>Costo</strong><br>$0 costos de servidor.</div>
+                <div class="grid-item">✈️ <strong>Offline</strong><br>Funciona sin internet.</div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Prompt API Intro -->
+        <div class="slide" id="slide-5">
+            <h2>La API de Prompt</h2>
+            <p>La "Navaja Suiza" de la IA Integrada.</p>
+            <div class="glass-card">
+                <p>Conversación libre • Sesiones con estado • Chatbots</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Availability Demo -->
+        <div class="slide" id="slide-6">
+            <h2>Paso 1: Verificar Disponibilidad</h2>
+            <div class="layout-split">
+                <div class="split-item">
+                    <pre><code class="language-javascript">const availability = await LanguageModel.availability();
+if (availability === 'no') return;
+console.log("Modelo disponible");</code></pre>
+                </div>
+                <div class="split-item">
+                    <button onclick="runAvailabilityDemo()">Verificar Disponibilidad</button>
+                    <div id="output-availability" class="output-box">Esperando...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Session Demo -->
+        <div class="slide" id="slide-7">
+            <h2>Paso 2: Crear Sesión</h2>
+            <div class="layout-split">
+                <div class="split-item">
+                    <pre><code class="language-javascript">const session = await LanguageModel.create({
+  systemPrompt: "Eres un asistente útil.",
+  monitor(m) { ... }
+});</code></pre>
+                </div>
+                <div class="split-item">
+                    <button onclick="runSessionDemo()">Crear Sesión</button>
+                    <div id="output-session" class="output-box">Esperando...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Streaming Demo -->
+        <div class="slide" id="slide-8">
+            <h2>Paso 3: Generación (Streaming)</h2>
+            <div class="layout-split">
+                <div class="split-item">
+                    <pre><code class="language-javascript">const stream = session.promptStreaming("Explicame algo!");
+for await (const chunk of stream) {
+  console.log(chunk);
+}</code></pre>
+                </div>
+                <div class="split-item">
+                    <button id="btn-streaming" onclick="runStreamingDemo()">Generar Respuesta</button>
+                    <div id="output-streaming" class="output-box">El resultado aparecerá aquí...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Playground -->
+        <div class="slide" id="slide-9">
+            <h2>Demo: Prompt Playground</h2>
+            <iframe src="../prompt-api-playground/index.html" width="100%" height="600px"
+                style="border: none; border-radius: 10px; background: white;"></iframe>
+        </div>
+
+        <!-- Slide 10: Token Counting -->
+        <div class="slide" id="slide-10">
+            <h2>Contando Tokens</h2>
+            <textarea id="token-input" placeholder="Escribe algo aquí para contar tokens..."></textarea>
+            <div id="token-count"
+                style="margin-top: 20px; font-size: 2rem; font-weight: bold; color: var(--accent-cyan);">Tokens: 0</div>
+        </div>
+
+    </div>
+
+    <div class="controls">
+        <button class="nav-btn" onclick="prevSlide()">&#8592;</button>
+        <button class="nav-btn" onclick="nextSlide()">&#8594;</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) {
+                    slide.classList.add('active');
+                }
+            });
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // --- AI Demos Logic ---
+
+        let demoSession = null;
+
+        async function runAvailabilityDemo() {
+            const output = document.getElementById('output-availability');
+            output.textContent = "Verificando...";
+
+            if (!self.LanguageModel) {
+                output.textContent = "Error: window.LanguageModel no está definido. Habilita las flags.";
+                return;
+            }
+
+            try {
+                const availability = await self.LanguageModel.availability();
+                output.textContent = `Disponibilidad: ${availability}`;
+
+                if (availability === 'no') {
+                    output.textContent += "\nEl modelo no está disponible.";
+                }
+            } catch (e) {
+                output.textContent = "Error: " + e.message;
+            }
+        }
+
+        async function runSessionDemo() {
+            const output = document.getElementById('output-session');
+            output.textContent = "Creando sesión...";
+
+            try {
+                if (!self.LanguageModel) {
+                    throw new Error("API no disponible");
+                }
+
+                demoSession = await self.LanguageModel.create({
+                    expectedInputs: [{ type: 'text', languages: ['es'] }],
+                    expectedOutputs: [{ type: 'text', languages: ['es'] }],
+                    systemPrompt: "Eres un asistente útil. Responde concisamente.",
+                    monitor(m) {
+                        m.addEventListener('downloadprogress', (e) => {
+                            const percent = Math.round((e.loaded / e.total) * 100);
+                            output.textContent = `Descargando modelo: ${percent}%`;
+                        });
+                    }
+                });
+
+                output.textContent = "¡Sesión creada exitosamente!";
+            } catch (e) {
+                output.textContent = "Error: " + e.message;
+            }
+        }
+
+        async function runStreamingDemo() {
+            const output = document.getElementById('output-streaming');
+            const btn = document.getElementById('btn-streaming');
+
+            if (!demoSession) {
+                output.textContent = "Error: Primero crea la sesión (Paso 2).";
+                return;
+            }
+
+            output.textContent = "Generando...";
+            btn.disabled = true;
+
+            try {
+                const stream = demoSession.promptStreaming("Explicame algo interesante sobre el espacio.");
+
+                let firstChunk = true;
+                let previousChunk = '';
+
+                for await (const chunk of stream) {
+                    if (firstChunk) {
+                        output.textContent = "";
+                        firstChunk = false;
+                    }
+                    const newChunk = chunk.startsWith(previousChunk)
+                        ? chunk.slice(previousChunk.length) : chunk;
+                    output.textContent += newChunk;
+                    previousChunk = chunk;
+
+                    // Auto-scroll
+                    output.scrollTop = output.scrollHeight;
+                }
+            } catch (e) {
+                output.textContent = "Error: " + e.message;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Token Counting
+        const tokenInput = document.getElementById('token-input');
+        const tokenCountDisplay = document.getElementById('token-count');
+
+        if (tokenInput) {
+            tokenInput.addEventListener('input', async () => {
+                const text = tokenInput.value;
+
+                try {
+                    if (!demoSession) {
+                        // Auto-create silently
+                        if (self.LanguageModel) {
+                            demoSession = await self.LanguageModel.create({
+                                expectedInputs: [{ type: 'text', languages: ['es'] }],
+                                expectedOutputs: [{ type: 'text', languages: ['es'] }]
+                            });
+                        }
+                    }
+
+                    if (demoSession) {
+                        let count;
+                        if (demoSession.countPromptTokens) {
+                            count = await demoSession.countPromptTokens(text);
+                        } else if (demoSession.measureInputUsage) {
+                            count = await demoSession.measureInputUsage(text);
+                        }
+                        tokenCountDisplay.textContent = `Tokens: ${count}`;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            });
+        }
+
+        // Init Highlight.js
+        hljs.highlightAll();
+    </script>
+</body>
+
+</html>

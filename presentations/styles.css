@@ -1,0 +1,195 @@
+/* Custom Styles for Web AI Presentation */
+:root {
+  --bg-dark: #1e1e1e;
+  --bg-darker: #2d2d2d;
+  --border-color: #333;
+  --text-color: #fff;
+  --accent-color: #a6e22e;
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+.split-layout.code-heavy .code-col {
+  flex: 3;
+}
+
+.demo-col {
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.demo-col:hover {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+  box-shadow: 0 10px 30px var(--shadow-color);
+}
+
+.demo-output {
+  margin-top: 10px;
+  text-align: left;
+  background: var(--bg-dark);
+  padding: 15px;
+  border-radius: 5px;
+  min-height: 100px;
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  white-space: pre-wrap;
+  font-size: 0.8em;
+  border: 1px solid var(--border-color);
+  color: var(--accent-color);
+}
+
+.demo-input {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg-darker);
+  border: 1px solid #444;
+  color: var(--text-color);
+  border-radius: 5px;
+  font-size: 0.8em;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+.demo-btn {
+  font-size: 0.8em !important;
+  padding: 10px 20px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 5px;
+  color: white;
+  transition: transform 0.1s;
+}
+
+.demo-btn:active {
+  transform: scale(0.98);
+}
+
+.demo-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Progress Bar */
+.progress-container {
+  width: 100%;
+  background-color: #333;
+  border-radius: 5px;
+  margin-top: 10px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  transition: width 0.3s ease;
+}
+
+/* Section Backgrounds */
+.bg-lang-detect {
+  background: linear-gradient(to bottom right, #1a2980, #26d0ce);
+}
+
+.bg-writer {
+  background: linear-gradient(to bottom right, #eb3349, #f45c43);
+}
+
+.bg-rewriter {
+  background: linear-gradient(to bottom right, #4776e6, #8e54e9);
+}
+
+.bg-byom {
+  background: linear-gradient(to bottom right, #000000, #434343);
+}
+
+.bg-advanced {
+  background: linear-gradient(to bottom right, #2b1055, #7597de);
+}
+
+/* Comparison Box */
+.comparison-box {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.comparison-item {
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 5px solid transparent;
+}
+
+.comparison-item.bad {
+  background: rgba(255, 0, 0, 0.1);
+  border-left-color: #ff5555;
+}
+
+.comparison-item.good {
+  background: rgba(0, 255, 0, 0.1);
+  border-left-color: #50fa7b;
+}
+
+/* Feature Card */
+.feature-card {
+  flex: 1;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.feature-card h4 {
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.feature-card p {
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+
+/* Support Table */
+.support-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.support-table th,
+.support-table td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.support-table th {
+  background: rgba(0, 0, 0, 0.4);
+  font-weight: bold;
+  color: #50fa7b;
+}
+
+.support-table tr:last-child td {
+  border-bottom: none;
+}
+
+.support-table tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
