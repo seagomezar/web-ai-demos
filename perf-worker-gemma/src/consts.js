@@ -2,7 +2,7 @@ export const MODEL_URL =
   'https://storage.googleapis.com/jmstore/kaggleweb/grader/g-2b-it-gpu-int4.bin';
 
 export const MEDIAPIPE_WASM =
-  'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai/wasm';
+  'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.19/wasm';
 
 export const MESSAGE_CODE = {
   PREPARING_MODEL: 'preparingModel',
@@ -11,6 +11,7 @@ export const MESSAGE_CODE = {
   RESPONSE_READY: 'responseReady',
   MODEL_ERROR: 'modelError',
   INFERENCE_ERROR: 'inferenceError',
+  MODEL_PROGRESS: 'modelProgress',
 };
 
 export const MODEL_STATUS = {

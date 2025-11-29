@@ -22,15 +22,23 @@ worker.onmessage = function (message) {
     );
   }
   const messageCode = message.data.code;
+  console.log(messageCode)
   switch (messageCode) {
     case MESSAGE_CODE.PREPARING_MODEL:
       displayModelStatus(MODEL_STATUS.PREPARING);
       document.getElementById('inferenceButton').disabled = true;
+      document.getElementById('progressContainer').style.display = 'block';
+      break;
+
+    case MESSAGE_CODE.MODEL_PROGRESS:
+      displayModelStatus(`${MODEL_STATUS.PREPARING} (${message.data.payload}%)`);
+      document.getElementById('progressBar').style.width = `${message.data.payload}%`;
       break;
 
     case MESSAGE_CODE.MODEL_READY:
       displayModelStatus(MODEL_STATUS.READY);
       document.getElementById('inferenceButton').disabled = false;
+      document.getElementById('progressContainer').style.display = 'none';
       break;
 
     case MESSAGE_CODE.GENERATING_RESPONSE:

@@ -16,7 +16,9 @@ format:
       - text: |
           <script src="scripts.js"></script>
 ---
-
+<script type="module">
+    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.0';
+</script>
 <div style="text-align: center; margin-top: 20px;">
   <img src="assets/slide Promo.png" style="max-width: 600px; width: 100%; border-radius: 15px; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
   <p style="font-size: 1.2em; margin-top: 10px; margin-bottom: 5px;">Engineering Manager at Twilio</p>
@@ -26,8 +28,6 @@ format:
 ::: {.notes}
 ¿Alguna vez has estado en un avión sin internet? ¿Quisieras seguir chateando con Gemini, ChatGPT o Claude Code?, quizá no, pero quizá hayas creado un espectacular sitio web que necesite traducción (y no pagar por ella), o quizá desees que un texto en tu aplicación se vea diferente dependiendo del país, el lenguaje o región? Uneté a mí en esta charla donde te muestro cómo usar IA en aplicaciones para el browser, sin costo y totalmente offline. Solo necesito tus superpoderes con javascript y el resto corre por mi cuenta.
 :::
-
-## {background-image="assets/agenda_slide.png" background-size="contain"}
 
 ## Comenzando
 
@@ -78,10 +78,11 @@ Estamos moviendo la inteligencia de la nube al borde (edge). En lugar de enviar 
 ## ¿Por qué ejecutar IA en el navegador? {background-image="assets/privacy_shield_background_1764037863751.png" background-opacity="0.4"}
 
 <ul style="background: rgba(0,0,0,0.6); padding: 40px; border-radius: 15px;">
-  <li class="fragment"><strong>Privacidad:</strong> Los datos nunca salen del dispositivo.</li>
-  <li class="fragment"><strong>Latencia:</strong> Cero viajes de red.</li>
-  <li class="fragment"><strong>Costo:</strong> $0 costos de servidor.</li>
-  <li class="fragment"><strong>Offline:</strong> Funciona sin internet.</li>
+  <li class="fragment"><strong>Privacidad:</strong> Procesamiento local de datos sensibles (ej. encriptación E2EE).</li>
+  <li class="fragment"><strong>Latencia:</strong> Resultados más rápidos (sin viajes al servidor).</li>
+  <li class="fragment"><strong>Offline:</strong> Funciona sin conexión a internet.</li>
+  <li class="fragment"><strong>Costo:</strong> Menores costos de API para desarrolladores.</li>
+  <li class="fragment"><strong>Híbrido:</strong> Modelos locales para usuarios gratuitos, nube para premium.</li>
 </ul>
 
 ::: {.notes}
@@ -127,9 +128,9 @@ Tenemos dos sabores principales:
 :::
 
 
-# Descripción General {background-image="assets/browser_brain_background_1764037882897.png" background-opacity="0.5"}
+# {background-image="assets/browser_brain_background_1764037882897.png" background-opacity="0.5"}
 
-<ul style="background: rgba(0,0,0,0.6); padding: 30px; border-radius: 15px; text-shadow: 1px 1px 2px #000;">
+<ul style="background: rgba(0,0,0,0.6); padding: 30px; border-radius: 15px; text-shadow: 1px 1px 2px #000; list-style-type: none;">
   <li><strong>Modelo:</strong> Gemini Nano</li>
   <li><strong>Distribución:</strong> Gestionado por Chrome</li>
   <li><strong>Acceso:</strong> APIs de JavaScript simples</li>
@@ -156,7 +157,10 @@ Es la API más versátil. Pueden usarla para casi cualquier tarea de texto a tex
 ```javascript
 // 1. Verificar disponibilidad
 const availability = await LanguageModel.availability();
-if (availability === 'no') return;
+if (availability === 'unavailable') return;
+if (availability === 'downloadable') {
+  console.log("Modelo se descargará al usarlo");
+}
 console.log("Modelo disponible");
 ```
 
@@ -220,9 +224,10 @@ Streaming es vital para la percepción de velocidad. No hagan esperar al usuario
 ## Contando Tokens
 
 ```javascript
-// The API that returns the token count for a prompt changed between Chrome Stable and Canary
-// and the method was renamed from `countPromptTokens(input)` to `measureInputUsage(input)`.
-// The code below ensures both cases are handled.
+// La API que retorna el número de tokens ha cambiado entre 
+// Chrome Stable y Canary y el método se renombró de 
+// `countPromptTokens(input)` a `measureInputUsage(input)`.
+// El código abajo asegura que ambos casos se manejen.
 if (session.countPromptTokens) {
   cost = await session.countPromptTokens(value);
 } else if (session.measureInputUsage) {
@@ -244,9 +249,12 @@ Contar tokens es importante para gestionar el contexto y evitar límites.
 
 Optimizada para condensar texto.
 
-- `tl;dr`
-- `teaser`
-- `headline`
+- Resumir transcripciones de reuniones.
+- Resumir chats de soporte para CRM.
+- Resumir reseñas de productos.
+- Resumir artículos largos (TL;DR).
+- Generar títulos de artículos.
+- Resumir preguntas de Q&A.
 
 ::: {.notes}
 Esta API es específica para resumir. Es más eficiente que usar la API de Prompt para esta tarea.
@@ -259,8 +267,8 @@ Esta API es específica para resumir. Es más eficiente que usar la API de Promp
 
 
 ```javascript
-const availability = await self.Summarizer.availability();
-if (availability === 'no') return;
+const availability = await Summarizer.availability();
+if (availability === 'unavailable') return;
 console.log("Modelo disponible");
 ```
 
@@ -278,7 +286,7 @@ El patrón es el mismo: verificar disponibilidad primero.
 ## Paso 2: Crear Summarizer
 
 ```javascript
-const summarizer = await self.Summarizer.create({
+const summarizer = await Summarizer.create({
   format: 'plain-text',
   monitor(m) {
     m.addEventListener('downloadprogress', (e) => {
@@ -315,9 +323,38 @@ console.log(summary);
 Simplemente pasen el texto y obtengan el resumen.
 :::
 
+## Ejemplo: Configuración Avanzada
+
+```javascript
+const options = { type: "teaser", expectedInputLanguages: ["ja"] };
+
+const availability = await Summarizer.availability(options);
+
+if (availability !== "unavailable") {
+  // We're good! Let's do the summarization using the built-in API.
+  if (availability !== "available") {
+    console.log("Sit tight, we need to do some downloading...");
+  }
+
+  const summarizer = await Summarizer.create(options);
+  console.log(await summarizer.summarize("La vida es bella"));
+} else {
+  // Either the API overall, or  the combination of teaser 
+  // + Japanese input, is not available. Use the cloud.
+  console.log(await doCloudSummarization("La vida es bella"));
+}
+```
+
+## Output
+<div style="margin-top: 20px;">
+  <button id="btn-sum-adv" onclick="runAdvancedSummarizerDemo()" class="demo-btn">Ejecutar Demo</button>
+  <div id="output-sum-adv" style="margin-top: 10px; text-align: left; background: #333; padding: 10px; border-radius: 5px; min-height: 40px; font-family: monospace; white-space: pre-wrap;"></div>
+</div>
+
+
 ## Demo: Summarization Playground
 
-<iframe src="../summarization-api-playground/dist/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload></iframe>
+<iframe src="../summarization-api-playground/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload></iframe>
 
 ### Paso 1: Disponibilidad (Detector) {class="bg-lang-detect"}
 
@@ -325,15 +362,15 @@ Simplemente pasen el texto y obtengan el resumen.
 
 ::: {.split-col .code-col}
 ```javascript
-// Modern API: self.ai.languageDetector
-const capabilities = await self.ai.languageDetector.capabilities();
+// Modern API: LanguageDetector
+const availability = await LanguageDetector.availability();
 
-if (capabilities.available === 'no') {
+if (availability === 'unavailable') {
   console.log("Modelo no disponible");
   return;
 }
 
-console.log("Modelo disponible:", capabilities.available);
+console.log("Modelo disponible");
 ```
 :::
 
@@ -360,8 +397,8 @@ Antes de traducir o procesar, a menudo necesitamos saber el idioma.
 
 ::: {.split-col .code-col}
 ```javascript
-// Modern API: self.ai.languageDetector
-const detector = await self.ai.languageDetector.create({
+// Modern API: LanguageDetector
+const detector = await LanguageDetector.create({
   monitor(m) {
     m.addEventListener('downloadprogress', (e) => {
       console.log(`Descargado ${e.loaded * 100}%`);
@@ -418,16 +455,24 @@ Devuelve una lista de idiomas probables con sus niveles de confianza.
 
 <iframe src="../translation-language-detection-api-playground/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload></iframe>
 
+## Casos de Uso: Writer
+
+- Explicar datos estructurados (gráficos, tablas).
+- Expandir listas de pros/contras.
+- Generar biografías desde CVs.
+- Superar el bloqueo del escritor (borradores).
+- Crear posts para redes sociales.
+
 ## Paso 1: Disponibilidad (Writer) {class="bg-writer"}
 
 ::: {.split-layout .code-heavy .vertical}
 
 ::: {.split-col .code-col}
 ```javascript
-// Modern API: self.ai.writer
-const availability = await self.ai.writer.availability();
+// Modern API: Writer
+const availability = await Writer.availability();
 
-if (availability === 'no') {
+if (availability === 'unavailable') {
   console.log("Modelo no disponible");
   return;
 }
@@ -455,8 +500,8 @@ Ayuda a escribir, refinar y elaborar textos.
 
 ::: {.split-col .code-col}
 ```javascript
-// Modern API: self.ai.writer
-const writer = await self.ai.writer.create({
+// Modern API: Writer
+const writer = await Writer.create({
   tone: 'formal',
   monitor(m) {
     m.addEventListener('downloadprogress', (e) => {
@@ -514,16 +559,23 @@ Generación de contenido basada en el prompt del usuario.
 
 <iframe src="../writer-rewriter-api-playground/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload></iframe>
 
+## Casos de Uso: Rewriter
+
+- Eliminar redundancias (ajuste de longitud).
+- Ajustar tono y formalidad.
+- Reformular lenguaje tóxico.
+- Simplificar lenguaje complejo.
+
 ## Paso 1: Disponibilidad (Rewriter) {class="bg-rewriter"}
 
 ::: {.split-layout .code-heavy .vertical}
 
 ::: {.split-col .code-col}
 ```javascript
-// Modern API: self.ai.rewriter
-const availability = await self.ai.rewriter.availability();
+// Modern API: Rewriter
+const availability = await Rewriter.availability();
 
-if (availability === 'no') {
+if (availability === 'unavailable') {
   console.log("Modelo no disponible");
   return;
 }
@@ -553,8 +605,8 @@ Diferencia: `self.Rewriter` vs `self.Writer`
 
 ::: {.split-col .code-col}
 ```javascript
-// Modern API: self.ai.rewriter
-const rewriter = await self.ai.rewriter.create({
+// Modern API: Rewriter
+const rewriter = await Rewriter.create({
   tone: 'more-formal',
   length: 'shorter',
   monitor(m) {
@@ -660,7 +712,10 @@ const genai = await FilesetResolver.forGenAiTasks(
 );
 
 const llm = await LlmInference.createFromOptions(genai, {
-    baseOptions: { modelAssetPath: '/assets/gemma-3n-E4B-it-int4-Web.litertlm' },
+    baseOptions: 
+      { 
+        modelAssetPath: '/assets/gemma-3n-E4B-it-int4-Web.litertlm' 
+      },
     maxTokens: 1000,
     topK: 40,
     temperature: 0.8
@@ -791,7 +846,78 @@ Si recuerdan una cosa de hoy: NUNCA ejecuten inferencia en el hilo principal.
 
 ## Demo: Worker vs No-Worker
 
-<iframe src="../perf-worker-gemma/dist/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload></iframe>
+<iframe src="../perf-worker-gemma/src/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload></iframe>
+
+# Transformers.js {class="bg-advanced"}
+
+<ul style="background: rgba(0,0,0,0.6); padding: 40px; border-radius: 15px;">
+  <li><strong>Uso:</strong> Modelos de Hugging Face en el navegador.</li>
+  <li><strong>Stack:</strong> ONNX Runtime Web (WebAssembly / WebGPU).</li>
+  <li><strong>Librería:</strong> @huggingface/transformers.</li>
+</ul>
+
+::: {.notes}
+Transformers.js permite ejecutar modelos de última generación de Hugging Face directamente en el navegador.
+:::
+
+## Conceptos Básicos {class="bg-advanced"}
+
+Comienza creando una instancia de `pipeline()` y especificando la tarea.
+
+```javascript
+import { pipeline } from '@huggingface/transformers';
+
+// Crear pipeline de análisis de sentimientos
+const classifier = await pipeline('sentiment-analysis');
+```
+
+::: {.notes}
+Al ejecutar por primera vez, descargará y almacenará en caché el modelo predeterminado. Las llamadas subsiguientes serán mucho más rápidas.
+:::
+
+## Inferencia {class="bg-advanced"}
+
+Usa el clasificador en tu texto objetivo:
+
+```javascript
+const result = await classifier('¡Amo Transformers.js!');
+// [{'label': 'POSITIVE', 'score': 0.9998}]
+```
+
+Múltiples entradas:
+
+```javascript
+const result = await classifier([
+  '¡Amo Transformers.js!', 
+  'Odio los bugs.'
+]);
+// [{'label': 'POSITIVE', ...}, {'label': 'NEGATIVE', ...}]
+```
+
+::: {.notes}
+La API es muy similar a la de Python, lo que facilita la migración.
+:::
+
+## Modelos Personalizados {class="bg-advanced"}
+
+Puedes especificar un modelo diferente como segundo argumento.
+
+```javascript
+// Usar un modelo específico (ej. estrellas 1-5)
+const reviewer = await pipeline(
+  'sentiment-analysis', 
+  'Xenova/bert-base-multilingual-uncased-sentiment'
+);
+
+const result = await reviewer(
+  'The Shawshank Redemption es una obra maestra.'
+);
+// [{label: '5 stars', score: 0.81...}]
+```
+
+::: {.notes}
+Por defecto usa modelos cuantizados para la web, pero puedes elegir cualquiera compatible en el Hub.
+:::
 
 # Respuestas en Streaming (SSE) {class="bg-advanced"}
 

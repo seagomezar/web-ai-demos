@@ -205,22 +205,22 @@ async function runLangDetectAvailability() {
 
     try {
         // Modern API
-        if (self.ai && self.ai.languageDetector) {
-            const capabilities = await self.ai.languageDetector.capabilities();
+        if (self.LanguageDetector) {
+            const capabilities = await self.LanguageDetector.capabilities();
             output.textContent = `Disponibilidad (Modern): ${capabilities.available}`;
             return;
         }
 
         // Legacy API
-        if (self.LanguageDetector) {
-            const availability = await self.LanguageDetector.availability();
+        if (self.ai && self.ai.languageDetector) {
+            const availability = await self.ai.languageDetector.availability();
             // Handle object or string return
             const status = typeof availability === 'object' ? availability.available : availability;
             output.textContent = `Disponibilidad (Legacy): ${status}`;
             return;
         }
 
-        output.textContent = "Error: API de detección de idioma no encontrada (self.ai.languageDetector).";
+        output.textContent = "Error: API de detección de idioma no encontrada (LanguageDetector).";
     } catch (e) {
         output.textContent = "Error: " + e.message;
     } finally {
@@ -249,14 +249,14 @@ async function runLangDetectCreation() {
         };
 
         // Modern API
-        if (self.ai && self.ai.languageDetector) {
-            demoDetector = await self.ai.languageDetector.create(monitorConfig);
+        if (self.LanguageDetector) {
+            demoDetector = await self.LanguageDetector.create(monitorConfig);
         }
         // Legacy API
-        else if (self.LanguageDetector) {
-            demoDetector = await self.LanguageDetector.create(monitorConfig);
+        else if (self.ai && self.ai.languageDetector) {
+            demoDetector = await self.ai.languageDetector.create(monitorConfig);
         } else {
-            throw new Error("API no encontrada (self.ai.languageDetector o self.LanguageDetector)");
+            throw new Error("API no encontrada (LanguageDetector)");
         }
 
         progressBar.style.width = '100%';
@@ -304,12 +304,12 @@ async function runWriterAvailability() {
         let availability = 'no';
 
         // Modern API
-        if (self.ai && self.ai.writer) {
-            availability = await self.ai.writer.availability();
+        if (self.Writer) {
+            availability = await self.Writer.availability();
         }
         // Legacy API
-        else if (self.Writer) {
-            availability = await self.Writer.availability();
+        else if (self.ai && self.ai.writer) {
+            availability = await self.ai.writer.availability();
         } else {
             output.textContent = "API Writer no soportada en este navegador.";
             return;
@@ -317,7 +317,7 @@ async function runWriterAvailability() {
 
         output.textContent = `Disponibilidad: ${availability}`;
 
-        if (availability === 'no') {
+        if (availability === 'unavailable') {
             output.textContent += " (Intenta habilitar las flags)";
         }
     } catch (e) {
@@ -347,15 +347,15 @@ async function runWriterCreation() {
         };
 
         // Modern API
-        if (self.ai && self.ai.writer) {
-            demoWriter = await self.ai.writer.create({
+        if (self.Writer) {
+            demoWriter = await self.Writer.create({
                 tone: 'formal',
                 ...monitorConfig
             });
         }
         // Legacy API
-        else if (self.Writer) {
-            demoWriter = await self.Writer.create({
+        else if (self.ai && self.ai.writer) {
+            demoWriter = await self.ai.writer.create({
                 tone: 'formal',
                 ...monitorConfig
             });
@@ -413,12 +413,12 @@ async function runRewriterAvailability() {
         let availability = 'no';
 
         // Modern API
-        if (self.ai && self.ai.rewriter) {
-            availability = await self.ai.rewriter.availability();
+        if (self.Rewriter) {
+            availability = await self.Rewriter.availability();
         }
         // Legacy API
-        else if (self.Rewriter) {
-            availability = await self.Rewriter.availability();
+        else if (self.ai && self.ai.rewriter) {
+            availability = await self.ai.rewriter.availability();
         } else {
             output.textContent = "API Rewriter no soportada en este navegador.";
             return;
@@ -426,7 +426,7 @@ async function runRewriterAvailability() {
 
         output.textContent = `Disponibilidad: ${availability}`;
 
-        if (availability === 'no') {
+        if (availability === 'unavailable') {
             output.textContent += " (Intenta habilitar las flags)";
         }
     } catch (e) {
@@ -463,12 +463,12 @@ async function runRewriterCreation() {
         };
 
         // Modern API
-        if (self.ai && self.ai.rewriter) {
-            demoRewriter = await self.ai.rewriter.create(createOptions);
+        if (self.Rewriter) {
+            demoRewriter = await self.Rewriter.create(createOptions);
         }
         // Legacy API
-        else if (self.Rewriter) {
-            demoRewriter = await self.Rewriter.create(createOptions);
+        else if (self.ai && self.ai.rewriter) {
+            demoRewriter = await self.ai.rewriter.create(createOptions);
         } else {
             throw new Error("API no encontrada");
         }
@@ -507,6 +507,54 @@ async function runRewriterExecution() {
         }
     } catch (e) {
         output.textContent = "Error: " + e.message;
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+async function doCloudSummarization(text) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve("Resumen desde la nube: La vida es bella (simulado).");
+        }, 1000);
+    });
+}
+
+async function runAdvancedSummarizerDemo() {
+    const output = document.getElementById('output-sum-adv');
+    const btn = document.getElementById('btn-sum-adv');
+
+    output.textContent = "Iniciando demo avanzada...";
+    btn.disabled = true;
+
+    try {
+        const options = { type: "teaser", expectedInputLanguages: ["ja"] };
+
+        if (!self.Summarizer) {
+            output.textContent = "API Summarizer no disponible. Usando nube...";
+            const cloudResult = await doCloudSummarization("La vida es bella");
+            output.textContent = cloudResult;
+            return;
+        }
+
+        const availability = await self.Summarizer.availability(options);
+        output.textContent = `Disponibilidad: ${availability}\n`;
+
+        if (availability !== "unavailable") {
+            if (availability !== "available") {
+                output.textContent += "Descargando modelo...\n";
+            }
+
+            const summarizer = await self.Summarizer.create(options);
+            const result = await summarizer.summarize("La vida es bella");
+            output.textContent += `Resumen local: ${result}`;
+        } else {
+            output.textContent += "Modelo local no disponible. Usando nube...\n";
+            const cloudResult = await doCloudSummarization("La vida es bella");
+            output.textContent += cloudResult;
+        }
+    } catch (e) {
+        output.textContent += "Error: " + e.message;
     } finally {
         btn.disabled = false;
     }

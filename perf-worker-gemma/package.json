@@ -10,7 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@mediapipe/tasks-genai": "^0.10.14"
+    "@mediapipe/tasks-genai": "0.10.19"
   },
   "devDependencies": {
     "parcel": "^2.12.0"

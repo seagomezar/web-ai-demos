@@ -9,7 +9,36 @@ let llmInference = null;
   self.postMessage({ code: MESSAGE_CODE.PREPARING_MODEL, payload: null });
   try {
     const genai = await FilesetResolver.forGenAiTasks(MEDIAPIPE_WASM);
-    llmInference = await LlmInference.createFromModelPath(genai, MODEL_URL);
+    console.log(genai)
+
+    // Manual fetch to track progress
+    const response = await fetch(MODEL_URL);
+    const contentLength = response.headers.get('content-length');
+    const total = parseInt(contentLength, 10);
+    let loaded = 0;
+
+    const res = new Response(new ReadableStream({
+      async start(controller) {
+        const reader = response.body.getReader();
+        for (; ;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          loaded += value.byteLength;
+          if (total) {
+            const progress = Math.round((loaded / total) * 100);
+            self.postMessage({ code: MESSAGE_CODE.MODEL_PROGRESS, payload: progress });
+          }
+          controller.enqueue(value);
+        }
+        controller.close();
+      },
+    }));
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+
+    llmInference = await LlmInference.createFromModelPath(genai, url);
+    console.log(llmInference)
     self.postMessage({ code: MESSAGE_CODE.MODEL_READY, payload: null });
   } catch (error) {
     console.error('[Worker] Error preparing model:', error);

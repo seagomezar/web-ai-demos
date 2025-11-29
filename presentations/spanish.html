@@ -207,6 +207,9 @@ Sebastian Gomez - <span class="citation" data-cites="sebasgojs">@sebasgojs</span
 </section>
 <section class="slide level2">
 
+<script type="module">
+    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.0';
+</script>
 <div style="text-align: center; margin-top: 20px;">
 <img src="assets/slide Promo.png" style="max-width: 600px; width: 100%; border-radius: 15px; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
 <p style="font-size: 1.2em; margin-top: 10px; margin-bottom: 5px;">
@@ -229,9 +232,6 @@ GDE en Web Technologies
           overflow: hidden!important;
           display:block!important;
       }</style></aside>
-</section>
-<section id="section" class="slide level2" data-background-image="assets/agenda_slide.png" data-background-size="contain">
-<h2></h2>
 </section>
 <section id="comenzando" class="slide level2">
 <h2>Comenzando</h2>
@@ -298,16 +298,19 @@ Web AI
 <h2>¿Por qué ejecutar IA en el navegador?</h2>
 <ul style="background: rgba(0,0,0,0.6); padding: 40px; border-radius: 15px;">
 <li class="fragment">
-<strong>Privacidad:</strong> Los datos nunca salen del dispositivo.
+<strong>Privacidad:</strong> Procesamiento local de datos sensibles (ej. encriptación E2EE).
 </li>
 <li class="fragment">
-<strong>Latencia:</strong> Cero viajes de red.
+<strong>Latencia:</strong> Resultados más rápidos (sin viajes al servidor).
 </li>
 <li class="fragment">
-<strong>Costo:</strong> $0 costos de servidor.
+<strong>Offline:</strong> Funciona sin conexión a internet.
 </li>
 <li class="fragment">
-<strong>Offline:</strong> Funciona sin internet.
+<strong>Costo:</strong> Menores costos de API para desarrolladores.
+</li>
+<li class="fragment">
+<strong>Híbrido:</strong> Modelos locales para usuarios gratuitos, nube para premium.
 </li>
 </ul>
 <aside class="notes">
@@ -378,9 +381,9 @@ Built-in AI
       }</style></aside>
 </section>
 <section>
-<section id="descripción-general" class="title-slide slide level1 center" data-background-image="assets/browser_brain_background_1764037882897.png" data-background-opacity="0.5">
-<h1>Descripción General</h1>
-<ul style="background: rgba(0,0,0,0.6); padding: 30px; border-radius: 15px; text-shadow: 1px 1px 2px #000;">
+<section id="section" class="title-slide slide level1 center" data-background-image="assets/browser_brain_background_1764037882897.png" data-background-opacity="0.5">
+<h1></h1>
+<ul style="background: rgba(0,0,0,0.6); padding: 30px; border-radius: 15px; text-shadow: 1px 1px 2px #000; list-style-type: none;">
 <li>
 <strong>Modelo:</strong> Gemini Nano
 </li>
@@ -431,8 +434,11 @@ Built-in AI
 <h2>Paso 1: Verificar Disponibilidad</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb1-1"><a href=""></a><span class="co">// 1. Verificar disponibilidad</span></span>
 <span id="cb1-2"><a href=""></a><span class="kw">const</span> availability <span class="op">=</span> <span class="cf">await</span> LanguageModel<span class="op">.</span><span class="fu">availability</span>()<span class="op">;</span></span>
-<span id="cb1-3"><a href=""></a><span class="cf">if</span> (availability <span class="op">===</span> <span class="st">'no'</span>) <span class="cf">return</span><span class="op">;</span></span>
-<span id="cb1-4"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo disponible"</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href=""></a><span class="cf">if</span> (availability <span class="op">===</span> <span class="st">'unavailable'</span>) <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb1-4"><a href=""></a><span class="cf">if</span> (availability <span class="op">===</span> <span class="st">'downloadable'</span>) {</span>
+<span id="cb1-5"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo se descargará al usarlo"</span>)<span class="op">;</span></span>
+<span id="cb1-6"><a href=""></a>}</span>
+<span id="cb1-7"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo disponible"</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div style="margin-top: 20px;">
 <button id="btn-availability" onclick="runAvailabilityDemo()" class="demo-btn">Verificar Disponibilidad</button>
 <div id="output-availability" style="margin-top: 10px; text-align: left; background: #333; padding: 10px; border-radius: 5px; min-height: 40px; font-family: monospace; white-space: pre-wrap;">
@@ -520,15 +526,16 @@ Built-in AI
 </section>
 <section id="contando-tokens" class="slide level2">
 <h2>Contando Tokens</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb4-1"><a href=""></a><span class="co">// The API that returns the token count for a prompt changed between Chrome Stable and Canary</span></span>
-<span id="cb4-2"><a href=""></a><span class="co">// and the method was renamed from `countPromptTokens(input)` to `measureInputUsage(input)`.</span></span>
-<span id="cb4-3"><a href=""></a><span class="co">// The code below ensures both cases are handled.</span></span>
-<span id="cb4-4"><a href=""></a><span class="cf">if</span> (session<span class="op">.</span><span class="at">countPromptTokens</span>) {</span>
-<span id="cb4-5"><a href=""></a>  cost <span class="op">=</span> <span class="cf">await</span> session<span class="op">.</span><span class="fu">countPromptTokens</span>(value)<span class="op">;</span></span>
-<span id="cb4-6"><a href=""></a>} <span class="cf">else</span> <span class="cf">if</span> (session<span class="op">.</span><span class="at">measureInputUsage</span>) {</span>
-<span id="cb4-7"><a href=""></a>  cost <span class="op">=</span> <span class="cf">await</span> session<span class="op">.</span><span class="fu">measureInputUsage</span>(value)<span class="op">;</span></span>
-<span id="cb4-8"><a href=""></a>}</span>
-<span id="cb4-9"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Tokens: </span><span class="sc">${</span>count<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb4-1"><a href=""></a><span class="co">// La API que retorna el número de tokens ha cambiado entre </span></span>
+<span id="cb4-2"><a href=""></a><span class="co">// Chrome Stable y Canary y el método se renombró de </span></span>
+<span id="cb4-3"><a href=""></a><span class="co">// `countPromptTokens(input)` a `measureInputUsage(input)`.</span></span>
+<span id="cb4-4"><a href=""></a><span class="co">// El código abajo asegura que ambos casos se manejen.</span></span>
+<span id="cb4-5"><a href=""></a><span class="cf">if</span> (session<span class="op">.</span><span class="at">countPromptTokens</span>) {</span>
+<span id="cb4-6"><a href=""></a>  cost <span class="op">=</span> <span class="cf">await</span> session<span class="op">.</span><span class="fu">countPromptTokens</span>(value)<span class="op">;</span></span>
+<span id="cb4-7"><a href=""></a>} <span class="cf">else</span> <span class="cf">if</span> (session<span class="op">.</span><span class="at">measureInputUsage</span>) {</span>
+<span id="cb4-8"><a href=""></a>  cost <span class="op">=</span> <span class="cf">await</span> session<span class="op">.</span><span class="fu">measureInputUsage</span>(value)<span class="op">;</span></span>
+<span id="cb4-9"><a href=""></a>}</span>
+<span id="cb4-10"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Tokens: </span><span class="sc">${</span>count<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div style="margin-top: 20px;">
 <textarea id="token-input" placeholder="Escribe algo aquí para contar tokens..." style="width: 80%; height: 100px; font-size: 18px; padding: 10px; background: #333; color: white; border: 1px solid #555;"></textarea>
 <div id="token-count" style="margin-top: 10px; font-size: 24px; font-weight: bold;">
@@ -553,9 +560,12 @@ Tokens: 0
 <h2>API de Resumen</h2>
 <p>Optimizada para condensar texto.</p>
 <ul>
-<li><code>tl;dr</code></li>
-<li><code>teaser</code></li>
-<li><code>headline</code></li>
+<li>Resumir transcripciones de reuniones.</li>
+<li>Resumir chats de soporte para CRM.</li>
+<li>Resumir reseñas de productos.</li>
+<li>Resumir artículos largos (TL;DR).</li>
+<li>Generar títulos de artículos.</li>
+<li>Resumir preguntas de Q&amp;A.</li>
 </ul>
 <aside class="notes">
 <p>Esta API es específica para resumir. Es más eficiente que usar la API de Prompt para esta tarea.</p>
@@ -576,8 +586,8 @@ Tokens: 0
 <div>
 window.Sumarizer
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb5-1"><a href=""></a><span class="kw">const</span> availability <span class="op">=</span> <span class="cf">await</span> self<span class="op">.</span><span class="at">Summarizer</span><span class="op">.</span><span class="fu">availability</span>()<span class="op">;</span></span>
-<span id="cb5-2"><a href=""></a><span class="cf">if</span> (availability <span class="op">===</span> <span class="st">'no'</span>) <span class="cf">return</span><span class="op">;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb5-1"><a href=""></a><span class="kw">const</span> availability <span class="op">=</span> <span class="cf">await</span> Summarizer<span class="op">.</span><span class="fu">availability</span>()<span class="op">;</span></span>
+<span id="cb5-2"><a href=""></a><span class="cf">if</span> (availability <span class="op">===</span> <span class="st">'unavailable'</span>) <span class="cf">return</span><span class="op">;</span></span>
 <span id="cb5-3"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo disponible"</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div style="margin-top: 20px;">
 <button id="btn-sum-avail" onclick="runSummarizerAvailability()" class="demo-btn">Verificar</button>
@@ -601,7 +611,7 @@ Esperando…
 </section>
 <section id="paso-2-crear-summarizer" class="slide level2">
 <h2>Paso 2: Crear Summarizer</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb6-1"><a href=""></a><span class="kw">const</span> summarizer <span class="op">=</span> <span class="cf">await</span> self<span class="op">.</span><span class="at">Summarizer</span><span class="op">.</span><span class="fu">create</span>({</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb6-1"><a href=""></a><span class="kw">const</span> summarizer <span class="op">=</span> <span class="cf">await</span> Summarizer<span class="op">.</span><span class="fu">create</span>({</span>
 <span id="cb6-2"><a href=""></a>  <span class="dt">format</span><span class="op">:</span> <span class="st">'plain-text'</span><span class="op">,</span></span>
 <span id="cb6-3"><a href=""></a>  <span class="fu">monitor</span>(m) {</span>
 <span id="cb6-4"><a href=""></a>    m<span class="op">.</span><span class="fu">addEventListener</span>(<span class="st">'downloadprogress'</span><span class="op">,</span> (e) <span class="kw">=&gt;</span> {</span>
@@ -655,22 +665,51 @@ Esperando…
           display:block!important;
       }</style></aside>
 </section>
+<section id="ejemplo-configuración-avanzada" class="slide level2">
+<h2>Ejemplo: Configuración Avanzada</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb8-1"><a href=""></a><span class="kw">const</span> options <span class="op">=</span> { <span class="dt">type</span><span class="op">:</span> <span class="st">"teaser"</span><span class="op">,</span> <span class="dt">expectedInputLanguages</span><span class="op">:</span> [<span class="st">"ja"</span>] }<span class="op">;</span></span>
+<span id="cb8-2"><a href=""></a></span>
+<span id="cb8-3"><a href=""></a><span class="kw">const</span> availability <span class="op">=</span> <span class="cf">await</span> Summarizer<span class="op">.</span><span class="fu">availability</span>(options)<span class="op">;</span></span>
+<span id="cb8-4"><a href=""></a></span>
+<span id="cb8-5"><a href=""></a><span class="cf">if</span> (availability <span class="op">!==</span> <span class="st">"unavailable"</span>) {</span>
+<span id="cb8-6"><a href=""></a>  <span class="co">// We're good! Let's do the summarization using the built-in API.</span></span>
+<span id="cb8-7"><a href=""></a>  <span class="cf">if</span> (availability <span class="op">!==</span> <span class="st">"available"</span>) {</span>
+<span id="cb8-8"><a href=""></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Sit tight, we need to do some downloading..."</span>)<span class="op">;</span></span>
+<span id="cb8-9"><a href=""></a>  }</span>
+<span id="cb8-10"><a href=""></a></span>
+<span id="cb8-11"><a href=""></a>  <span class="kw">const</span> summarizer <span class="op">=</span> <span class="cf">await</span> Summarizer<span class="op">.</span><span class="fu">create</span>(options)<span class="op">;</span></span>
+<span id="cb8-12"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="cf">await</span> summarizer<span class="op">.</span><span class="fu">summarize</span>(<span class="st">"La vida es bella"</span>))<span class="op">;</span></span>
+<span id="cb8-13"><a href=""></a>} <span class="cf">else</span> {</span>
+<span id="cb8-14"><a href=""></a>  <span class="co">// Either the API overall, or  the combination of teaser </span></span>
+<span id="cb8-15"><a href=""></a>  <span class="co">// + Japanese input, is not available. Use the cloud.</span></span>
+<span id="cb8-16"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="cf">await</span> <span class="fu">doCloudSummarization</span>(<span class="st">"La vida es bella"</span>))<span class="op">;</span></span>
+<span id="cb8-17"><a href=""></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="output" class="slide level2">
+<h2>Output</h2>
+<div style="margin-top: 20px;">
+<button id="btn-sum-adv" onclick="runAdvancedSummarizerDemo()" class="demo-btn">Ejecutar Demo</button>
+<div id="output-sum-adv" style="margin-top: 10px; text-align: left; background: #333; padding: 10px; border-radius: 5px; min-height: 40px; font-family: monospace; white-space: pre-wrap;">
+
+</div>
+</div>
+</section>
 <section id="demo-summarization-playground" class="slide level2">
 <h2>Demo: Summarization Playground</h2>
-<iframe src="../summarization-api-playground/dist/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload="">
+<iframe src="../summarization-api-playground/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload="">
 </iframe>
 <h3 class="bg-lang-detect" id="paso-1-disponibilidad-detector">Paso 1: Disponibilidad (Detector)</h3>
 <div class="split-layout code-heavy vertical">
 <div class="split-col code-col">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb8-1"><a href=""></a><span class="co">// Modern API: self.ai.languageDetector</span></span>
-<span id="cb8-2"><a href=""></a><span class="kw">const</span> capabilities <span class="op">=</span> <span class="cf">await</span> self<span class="op">.</span><span class="at">ai</span><span class="op">.</span><span class="at">languageDetector</span><span class="op">.</span><span class="fu">capabilities</span>()<span class="op">;</span></span>
-<span id="cb8-3"><a href=""></a></span>
-<span id="cb8-4"><a href=""></a><span class="cf">if</span> (capabilities<span class="op">.</span><span class="at">available</span> <span class="op">===</span> <span class="st">'no'</span>) {</span>
-<span id="cb8-5"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo no disponible"</span>)<span class="op">;</span></span>
-<span id="cb8-6"><a href=""></a>  <span class="cf">return</span><span class="op">;</span></span>
-<span id="cb8-7"><a href=""></a>}</span>
-<span id="cb8-8"><a href=""></a></span>
-<span id="cb8-9"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo disponible:"</span><span class="op">,</span> capabilities<span class="op">.</span><span class="at">available</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb9-1"><a href=""></a><span class="co">// Modern API: LanguageDetector</span></span>
+<span id="cb9-2"><a href=""></a><span class="kw">const</span> availability <span class="op">=</span> <span class="cf">await</span> LanguageDetector<span class="op">.</span><span class="fu">availability</span>()<span class="op">;</span></span>
+<span id="cb9-3"><a href=""></a></span>
+<span id="cb9-4"><a href=""></a><span class="cf">if</span> (availability <span class="op">===</span> <span class="st">'unavailable'</span>) {</span>
+<span id="cb9-5"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo no disponible"</span>)<span class="op">;</span></span>
+<span id="cb9-6"><a href=""></a>  <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb9-7"><a href=""></a>}</span>
+<span id="cb9-8"><a href=""></a></span>
+<span id="cb9-9"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo disponible"</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="split-col demo-col">
 <p style="font-size: 0.8em; opacity: 0.8; margin-bottom: 15px;">
@@ -702,14 +741,14 @@ Esperando verificación…
 <h2>Paso 2: Crear Detector</h2>
 <div class="split-layout code-heavy vertical">
 <div class="split-col code-col">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb9-1"><a href=""></a><span class="co">// Modern API: self.ai.languageDetector</span></span>
-<span id="cb9-2"><a href=""></a><span class="kw">const</span> detector <span class="op">=</span> <span class="cf">await</span> self<span class="op">.</span><span class="at">ai</span><span class="op">.</span><span class="at">languageDetector</span><span class="op">.</span><span class="fu">create</span>({</span>
-<span id="cb9-3"><a href=""></a>  <span class="fu">monitor</span>(m) {</span>
-<span id="cb9-4"><a href=""></a>    m<span class="op">.</span><span class="fu">addEventListener</span>(<span class="st">'downloadprogress'</span><span class="op">,</span> (e) <span class="kw">=&gt;</span> {</span>
-<span id="cb9-5"><a href=""></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Descargado </span><span class="sc">${</span>e<span class="op">.</span><span class="at">loaded</span> <span class="op">*</span> <span class="dv">100</span><span class="sc">}</span><span class="vs">%`</span>)<span class="op">;</span></span>
-<span id="cb9-6"><a href=""></a>    })<span class="op">;</span></span>
-<span id="cb9-7"><a href=""></a>  }</span>
-<span id="cb9-8"><a href=""></a>})<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb10-1"><a href=""></a><span class="co">// Modern API: LanguageDetector</span></span>
+<span id="cb10-2"><a href=""></a><span class="kw">const</span> detector <span class="op">=</span> <span class="cf">await</span> LanguageDetector<span class="op">.</span><span class="fu">create</span>({</span>
+<span id="cb10-3"><a href=""></a>  <span class="fu">monitor</span>(m) {</span>
+<span id="cb10-4"><a href=""></a>    m<span class="op">.</span><span class="fu">addEventListener</span>(<span class="st">'downloadprogress'</span><span class="op">,</span> (e) <span class="kw">=&gt;</span> {</span>
+<span id="cb10-5"><a href=""></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Descargado </span><span class="sc">${</span>e<span class="op">.</span><span class="at">loaded</span> <span class="op">*</span> <span class="dv">100</span><span class="sc">}</span><span class="vs">%`</span>)<span class="op">;</span></span>
+<span id="cb10-6"><a href=""></a>    })<span class="op">;</span></span>
+<span id="cb10-7"><a href=""></a>  }</span>
+<span id="cb10-8"><a href=""></a>})<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="split-col demo-col">
 <button id="btn-lang-create" class="demo-btn" onclick="runLangDetectCreation()">
@@ -743,8 +782,8 @@ Esperando…
 <h2>Paso 3: Detectar Idioma</h2>
 <div class="split-layout code-heavy vertical">
 <div class="split-col code-col">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb10-1"><a href=""></a><span class="kw">const</span> results <span class="op">=</span> <span class="cf">await</span> detector<span class="op">.</span><span class="fu">detect</span>(inputText)<span class="op">;</span></span>
-<span id="cb10-2"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(results)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb11-1"><a href=""></a><span class="kw">const</span> results <span class="op">=</span> <span class="cf">await</span> detector<span class="op">.</span><span class="fu">detect</span>(inputText)<span class="op">;</span></span>
+<span id="cb11-2"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(results)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="split-col demo-col">
 <input type="text" id="input-lang-exec" class="demo-input" value="Bonjour le monde" placeholder="Escribe algo..."> <button id="btn-lang-exec" class="demo-btn" onclick="runLangDetectExecution()"> <span class="icon">🔍</span> Detectar </button>
@@ -772,19 +811,29 @@ El resultado aparecerá aquí…
 <iframe src="../translation-language-detection-api-playground/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload="">
 </iframe>
 </section>
+<section id="casos-de-uso-writer" class="slide level2">
+<h2>Casos de Uso: Writer</h2>
+<ul>
+<li>Explicar datos estructurados (gráficos, tablas).</li>
+<li>Expandir listas de pros/contras.</li>
+<li>Generar biografías desde CVs.</li>
+<li>Superar el bloqueo del escritor (borradores).</li>
+<li>Crear posts para redes sociales.</li>
+</ul>
+</section>
 <section id="paso-1-disponibilidad-writer" class="slide level2 bg-writer">
 <h2>Paso 1: Disponibilidad (Writer)</h2>
 <div class="split-layout code-heavy vertical">
 <div class="split-col code-col">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb11-1"><a href=""></a><span class="co">// Modern API: self.ai.writer</span></span>
-<span id="cb11-2"><a href=""></a><span class="kw">const</span> availability <span class="op">=</span> <span class="cf">await</span> self<span class="op">.</span><span class="at">ai</span><span class="op">.</span><span class="at">writer</span><span class="op">.</span><span class="fu">availability</span>()<span class="op">;</span></span>
-<span id="cb11-3"><a href=""></a></span>
-<span id="cb11-4"><a href=""></a><span class="cf">if</span> (availability <span class="op">===</span> <span class="st">'no'</span>) {</span>
-<span id="cb11-5"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo no disponible"</span>)<span class="op">;</span></span>
-<span id="cb11-6"><a href=""></a>  <span class="cf">return</span><span class="op">;</span></span>
-<span id="cb11-7"><a href=""></a>}</span>
-<span id="cb11-8"><a href=""></a></span>
-<span id="cb11-9"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo disponible:"</span><span class="op">,</span> availability)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb12-1"><a href=""></a><span class="co">// Modern API: Writer</span></span>
+<span id="cb12-2"><a href=""></a><span class="kw">const</span> availability <span class="op">=</span> <span class="cf">await</span> Writer<span class="op">.</span><span class="fu">availability</span>()<span class="op">;</span></span>
+<span id="cb12-3"><a href=""></a></span>
+<span id="cb12-4"><a href=""></a><span class="cf">if</span> (availability <span class="op">===</span> <span class="st">'unavailable'</span>) {</span>
+<span id="cb12-5"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo no disponible"</span>)<span class="op">;</span></span>
+<span id="cb12-6"><a href=""></a>  <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb12-7"><a href=""></a>}</span>
+<span id="cb12-8"><a href=""></a></span>
+<span id="cb12-9"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo disponible:"</span><span class="op">,</span> availability)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="split-col demo-col">
 <button id="btn-writer-avail" class="demo-btn" onclick="runWriterAvailability()">
@@ -813,15 +862,15 @@ Esperando…
 <h2>Paso 2: Crear Writer</h2>
 <div class="split-layout code-heavy vertical">
 <div class="split-col code-col">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb12-1"><a href=""></a><span class="co">// Modern API: self.ai.writer</span></span>
-<span id="cb12-2"><a href=""></a><span class="kw">const</span> writer <span class="op">=</span> <span class="cf">await</span> self<span class="op">.</span><span class="at">ai</span><span class="op">.</span><span class="at">writer</span><span class="op">.</span><span class="fu">create</span>({</span>
-<span id="cb12-3"><a href=""></a>  <span class="dt">tone</span><span class="op">:</span> <span class="st">'formal'</span><span class="op">,</span></span>
-<span id="cb12-4"><a href=""></a>  <span class="fu">monitor</span>(m) {</span>
-<span id="cb12-5"><a href=""></a>    m<span class="op">.</span><span class="fu">addEventListener</span>(<span class="st">'downloadprogress'</span><span class="op">,</span> (e) <span class="kw">=&gt;</span> {</span>
-<span id="cb12-6"><a href=""></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Descargado </span><span class="sc">${</span>e<span class="op">.</span><span class="at">loaded</span> <span class="op">*</span> <span class="dv">100</span><span class="sc">}</span><span class="vs">%`</span>)<span class="op">;</span></span>
-<span id="cb12-7"><a href=""></a>    })<span class="op">;</span></span>
-<span id="cb12-8"><a href=""></a>  }</span>
-<span id="cb12-9"><a href=""></a>})<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb13-1"><a href=""></a><span class="co">// Modern API: Writer</span></span>
+<span id="cb13-2"><a href=""></a><span class="kw">const</span> writer <span class="op">=</span> <span class="cf">await</span> Writer<span class="op">.</span><span class="fu">create</span>({</span>
+<span id="cb13-3"><a href=""></a>  <span class="dt">tone</span><span class="op">:</span> <span class="st">'formal'</span><span class="op">,</span></span>
+<span id="cb13-4"><a href=""></a>  <span class="fu">monitor</span>(m) {</span>
+<span id="cb13-5"><a href=""></a>    m<span class="op">.</span><span class="fu">addEventListener</span>(<span class="st">'downloadprogress'</span><span class="op">,</span> (e) <span class="kw">=&gt;</span> {</span>
+<span id="cb13-6"><a href=""></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Descargado </span><span class="sc">${</span>e<span class="op">.</span><span class="at">loaded</span> <span class="op">*</span> <span class="dv">100</span><span class="sc">}</span><span class="vs">%`</span>)<span class="op">;</span></span>
+<span id="cb13-7"><a href=""></a>    })<span class="op">;</span></span>
+<span id="cb13-8"><a href=""></a>  }</span>
+<span id="cb13-9"><a href=""></a>})<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="split-col demo-col">
 <button id="btn-writer-create" class="demo-btn" onclick="runWriterCreation()">
@@ -855,10 +904,10 @@ Esperando…
 <h2>Paso 3: Escribir</h2>
 <div class="split-layout code-heavy vertical">
 <div class="split-col code-col">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb13-1"><a href=""></a><span class="kw">const</span> stream <span class="op">=</span> <span class="cf">await</span> writer<span class="op">.</span><span class="fu">writeStreaming</span>(inputText)<span class="op">;</span></span>
-<span id="cb13-2"><a href=""></a><span class="cf">for</span> <span class="cf">await</span> (<span class="kw">const</span> chunk <span class="kw">of</span> stream) {</span>
-<span id="cb13-3"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(chunk)<span class="op">;</span></span>
-<span id="cb13-4"><a href=""></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb14-1"><a href=""></a><span class="kw">const</span> stream <span class="op">=</span> <span class="cf">await</span> writer<span class="op">.</span><span class="fu">writeStreaming</span>(inputText)<span class="op">;</span></span>
+<span id="cb14-2"><a href=""></a><span class="cf">for</span> <span class="cf">await</span> (<span class="kw">const</span> chunk <span class="kw">of</span> stream) {</span>
+<span id="cb14-3"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(chunk)<span class="op">;</span></span>
+<span id="cb14-4"><a href=""></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="split-col demo-col">
 <textarea id="input-writer-exec" class="demo-input" style="height: 80px;" placeholder="Escribe tu prompt aquí...">Un correo para pedir vacaciones.</textarea>
@@ -889,19 +938,28 @@ El resultado aparecerá aquí…
 <iframe src="../writer-rewriter-api-playground/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload="">
 </iframe>
 </section>
+<section id="casos-de-uso-rewriter" class="slide level2">
+<h2>Casos de Uso: Rewriter</h2>
+<ul>
+<li>Eliminar redundancias (ajuste de longitud).</li>
+<li>Ajustar tono y formalidad.</li>
+<li>Reformular lenguaje tóxico.</li>
+<li>Simplificar lenguaje complejo.</li>
+</ul>
+</section>
 <section id="paso-1-disponibilidad-rewriter" class="slide level2 bg-rewriter">
 <h2>Paso 1: Disponibilidad (Rewriter)</h2>
 <div class="split-layout code-heavy vertical">
 <div class="split-col code-col">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb14-1"><a href=""></a><span class="co">// Modern API: self.ai.rewriter</span></span>
-<span id="cb14-2"><a href=""></a><span class="kw">const</span> availability <span class="op">=</span> <span class="cf">await</span> self<span class="op">.</span><span class="at">ai</span><span class="op">.</span><span class="at">rewriter</span><span class="op">.</span><span class="fu">availability</span>()<span class="op">;</span></span>
-<span id="cb14-3"><a href=""></a></span>
-<span id="cb14-4"><a href=""></a><span class="cf">if</span> (availability <span class="op">===</span> <span class="st">'no'</span>) {</span>
-<span id="cb14-5"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo no disponible"</span>)<span class="op">;</span></span>
-<span id="cb14-6"><a href=""></a>  <span class="cf">return</span><span class="op">;</span></span>
-<span id="cb14-7"><a href=""></a>}</span>
-<span id="cb14-8"><a href=""></a></span>
-<span id="cb14-9"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo disponible:"</span><span class="op">,</span> availability)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb15-1"><a href=""></a><span class="co">// Modern API: Rewriter</span></span>
+<span id="cb15-2"><a href=""></a><span class="kw">const</span> availability <span class="op">=</span> <span class="cf">await</span> Rewriter<span class="op">.</span><span class="fu">availability</span>()<span class="op">;</span></span>
+<span id="cb15-3"><a href=""></a></span>
+<span id="cb15-4"><a href=""></a><span class="cf">if</span> (availability <span class="op">===</span> <span class="st">'unavailable'</span>) {</span>
+<span id="cb15-5"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo no disponible"</span>)<span class="op">;</span></span>
+<span id="cb15-6"><a href=""></a>  <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb15-7"><a href=""></a>}</span>
+<span id="cb15-8"><a href=""></a></span>
+<span id="cb15-9"><a href=""></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">"Modelo disponible:"</span><span class="op">,</span> availability)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="split-col demo-col">
 <button id="btn-rewriter-avail" class="demo-btn" onclick="runRewriterAvailability()">
@@ -931,16 +989,16 @@ Esperando…
 <p>Diferencia: <code>self.Rewriter</code> vs <code>self.Writer</code></p>
 <div class="split-layout code-heavy vertical">
 <div class="split-col code-col">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb15-1"><a href=""></a><span class="co">// Modern API: self.ai.rewriter</span></span>
-<span id="cb15-2"><a href=""></a><span class="kw">const</span> rewriter <span class="op">=</span> <span class="cf">await</span> self<span class="op">.</span><span class="at">ai</span><span class="op">.</span><span class="at">rewriter</span><span class="op">.</span><span class="fu">create</span>({</span>
-<span id="cb15-3"><a href=""></a>  <span class="dt">tone</span><span class="op">:</span> <span class="st">'more-formal'</span><span class="op">,</span></span>
-<span id="cb15-4"><a href=""></a>  <span class="dt">length</span><span class="op">:</span> <span class="st">'shorter'</span><span class="op">,</span></span>
-<span id="cb15-5"><a href=""></a>  <span class="fu">monitor</span>(m) {</span>
-<span id="cb15-6"><a href=""></a>    m<span class="op">.</span><span class="fu">addEventListener</span>(<span class="st">'downloadprogress'</span><span class="op">,</span> (e) <span class="kw">=&gt;</span> {</span>
-<span id="cb15-7"><a href=""></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Descargado </span><span class="sc">${</span>e<span class="op">.</span><span class="at">loaded</span> <span class="op">*</span> <span class="dv">100</span><span class="sc">}</span><span class="vs">%`</span>)<span class="op">;</span></span>
-<span id="cb15-8"><a href=""></a>    })<span class="op">;</span></span>
-<span id="cb15-9"><a href=""></a>  }</span>
-<span id="cb15-10"><a href=""></a>})<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb16-1"><a href=""></a><span class="co">// Modern API: Rewriter</span></span>
+<span id="cb16-2"><a href=""></a><span class="kw">const</span> rewriter <span class="op">=</span> <span class="cf">await</span> Rewriter<span class="op">.</span><span class="fu">create</span>({</span>
+<span id="cb16-3"><a href=""></a>  <span class="dt">tone</span><span class="op">:</span> <span class="st">'more-formal'</span><span class="op">,</span></span>
+<span id="cb16-4"><a href=""></a>  <span class="dt">length</span><span class="op">:</span> <span class="st">'shorter'</span><span class="op">,</span></span>
+<span id="cb16-5"><a href=""></a>  <span class="fu">monitor</span>(m) {</span>
+<span id="cb16-6"><a href=""></a>    m<span class="op">.</span><span class="fu">addEventListener</span>(<span class="st">'downloadprogress'</span><span class="op">,</span> (e) <span class="kw">=&gt;</span> {</span>
+<span id="cb16-7"><a href=""></a>      <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="vs">`Descargado </span><span class="sc">${</span>e<span class="op">.</span><span class="at">loaded</span> <span class="op">*</span> <span class="dv">100</span><span class="sc">}</span><span class="vs">%`</span>)<span class="op">;</span></span>
+<span id="cb16-8"><a href=""></a>    })<span class="op">;</span></span>
+<span id="cb16-9"><a href=""></a>  }</span>
+<span id="cb16-10"><a href=""></a>})<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="split-col demo-col">
 <button id="btn-rewriter-create" class="demo-btn" onclick="runRewriterCreation()">
@@ -974,14 +1032,14 @@ Esperando…
 <h2>Paso 3: Reescribir</h2>
 <div class="split-layout code-heavy vertical">
 <div class="split-col code-col">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb16-1"><a href=""></a><span class="kw">const</span> stream <span class="op">=</span> <span class="cf">await</span> rewriter<span class="op">.</span><span class="fu">rewriteStreaming</span>(</span>
-<span id="cb16-2"><a href=""></a>  inputText<span class="op">,</span> </span>
-<span id="cb16-3"><a href=""></a>  { <span class="dt">context</span><span class="op">:</span> contextText }</span>
-<span id="cb16-4"><a href=""></a>)<span class="op">;</span></span>
-<span id="cb16-5"><a href=""></a></span>
-<span id="cb16-6"><a href=""></a><span class="cf">for</span> <span class="cf">await</span> (<span class="kw">const</span> chunk <span class="kw">of</span> stream) {</span>
-<span id="cb16-7"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(chunk)<span class="op">;</span></span>
-<span id="cb16-8"><a href=""></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb17-1"><a href=""></a><span class="kw">const</span> stream <span class="op">=</span> <span class="cf">await</span> rewriter<span class="op">.</span><span class="fu">rewriteStreaming</span>(</span>
+<span id="cb17-2"><a href=""></a>  inputText<span class="op">,</span> </span>
+<span id="cb17-3"><a href=""></a>  { <span class="dt">context</span><span class="op">:</span> contextText }</span>
+<span id="cb17-4"><a href=""></a>)<span class="op">;</span></span>
+<span id="cb17-5"><a href=""></a></span>
+<span id="cb17-6"><a href=""></a><span class="cf">for</span> <span class="cf">await</span> (<span class="kw">const</span> chunk <span class="kw">of</span> stream) {</span>
+<span id="cb17-7"><a href=""></a>  <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(chunk)<span class="op">;</span></span>
+<span id="cb17-8"><a href=""></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="split-col demo-col">
 <textarea id="input-rewriter-exec" class="demo-input" style="height: 60px;" placeholder="Texto a reescribir...">Hola jefe, quiero vacaciones.</textarea>
@@ -1059,7 +1117,7 @@ El resultado aparecerá aquí…
 <h2>Configuración Rápida</h2>
 <ol type="1">
 <li><p><strong>Instalar:</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href=""></a><span class="ex">npm</span> install @mediapipe/tasks-genai</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href=""></a><span class="ex">npm</span> install @mediapipe/tasks-genai</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
 <li><p><strong>Descargar Modelo:</strong></p>
 <ul>
 <li>Gemma-3n E4B o E2B (versiones “-Web”).</li>
@@ -1082,18 +1140,21 @@ El resultado aparecerá aquí…
 </section>
 <section id="inicialización" class="slide level2 bg-byom">
 <h2>Inicialización</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb18-1"><a href=""></a><span class="kw">const</span> genai <span class="op">=</span> <span class="cf">await</span> FilesetResolver<span class="op">.</span><span class="fu">forGenAiTasks</span>(</span>
-<span id="cb18-2"><a href=""></a>    <span class="st">"https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@latest/wasm"</span></span>
-<span id="cb18-3"><a href=""></a>)<span class="op">;</span></span>
-<span id="cb18-4"><a href=""></a></span>
-<span id="cb18-5"><a href=""></a><span class="kw">const</span> llm <span class="op">=</span> <span class="cf">await</span> LlmInference<span class="op">.</span><span class="fu">createFromOptions</span>(genai<span class="op">,</span> {</span>
-<span id="cb18-6"><a href=""></a>    <span class="dt">baseOptions</span><span class="op">:</span> { <span class="dt">modelAssetPath</span><span class="op">:</span> <span class="st">'/assets/gemma-3n-E4B-it-int4-Web.litertlm'</span> }<span class="op">,</span></span>
-<span id="cb18-7"><a href=""></a>    <span class="dt">maxTokens</span><span class="op">:</span> <span class="dv">1000</span><span class="op">,</span></span>
-<span id="cb18-8"><a href=""></a>    <span class="dt">topK</span><span class="op">:</span> <span class="dv">40</span><span class="op">,</span></span>
-<span id="cb18-9"><a href=""></a>    <span class="dt">temperature</span><span class="op">:</span> <span class="fl">0.8</span></span>
-<span id="cb18-10"><a href=""></a>})<span class="op">;</span></span>
-<span id="cb18-11"><a href=""></a></span>
-<span id="cb18-12"><a href=""></a><span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">generateResponse</span>(inputPrompt)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb19-1"><a href=""></a><span class="kw">const</span> genai <span class="op">=</span> <span class="cf">await</span> FilesetResolver<span class="op">.</span><span class="fu">forGenAiTasks</span>(</span>
+<span id="cb19-2"><a href=""></a>    <span class="st">"https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@latest/wasm"</span></span>
+<span id="cb19-3"><a href=""></a>)<span class="op">;</span></span>
+<span id="cb19-4"><a href=""></a></span>
+<span id="cb19-5"><a href=""></a><span class="kw">const</span> llm <span class="op">=</span> <span class="cf">await</span> LlmInference<span class="op">.</span><span class="fu">createFromOptions</span>(genai<span class="op">,</span> {</span>
+<span id="cb19-6"><a href=""></a>    <span class="dt">baseOptions</span><span class="op">:</span> </span>
+<span id="cb19-7"><a href=""></a>      { </span>
+<span id="cb19-8"><a href=""></a>        <span class="dt">modelAssetPath</span><span class="op">:</span> <span class="st">'/assets/gemma-3n-E4B-it-int4-Web.litertlm'</span> </span>
+<span id="cb19-9"><a href=""></a>      }<span class="op">,</span></span>
+<span id="cb19-10"><a href=""></a>    <span class="dt">maxTokens</span><span class="op">:</span> <span class="dv">1000</span><span class="op">,</span></span>
+<span id="cb19-11"><a href=""></a>    <span class="dt">topK</span><span class="op">:</span> <span class="dv">40</span><span class="op">,</span></span>
+<span id="cb19-12"><a href=""></a>    <span class="dt">temperature</span><span class="op">:</span> <span class="fl">0.8</span></span>
+<span id="cb19-13"><a href=""></a>})<span class="op">;</span></span>
+<span id="cb19-14"><a href=""></a></span>
+<span id="cb19-15"><a href=""></a><span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">generateResponse</span>(inputPrompt)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <aside class="notes">
 <p><code>FilesetResolver</code> se encarga de cargar los binarios de WebAssembly (WASM) necesarios. <code>LlmInference</code> es la clase principal. Noten que apuntamos a un modelo <code>.litertlm</code> o <code>.bin</code> que hemos alojado en nuestros assets. Los parámetros como <code>temperature</code> y <code>topK</code> controlan la creatividad del modelo.</p>
 <style type="text/css">
@@ -1111,18 +1172,18 @@ El resultado aparecerá aquí…
 <section id="multimodalidad-gemma-3n" class="slide level2 bg-byom">
 <h2>Multimodalidad (Gemma-3n)</h2>
 <p>Soporte para Imágenes y Audio.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb19-1"><a href=""></a><span class="kw">const</span> llm <span class="op">=</span> <span class="cf">await</span> LlmInference<span class="op">.</span><span class="fu">createFromOptions</span>(genai<span class="op">,</span> {</span>
-<span id="cb19-2"><a href=""></a>    <span class="co">// ...</span></span>
-<span id="cb19-3"><a href=""></a>    <span class="dt">maxNumImages</span><span class="op">:</span> <span class="dv">5</span><span class="op">,</span></span>
-<span id="cb19-4"><a href=""></a>    <span class="dt">supportAudio</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
-<span id="cb19-5"><a href=""></a>})<span class="op">;</span></span>
-<span id="cb19-6"><a href=""></a></span>
-<span id="cb19-7"><a href=""></a><span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">generateResponse</span>([</span>
-<span id="cb19-8"><a href=""></a>  <span class="st">'Describe '</span><span class="op">,</span></span>
-<span id="cb19-9"><a href=""></a>  {<span class="dt">imageSource</span><span class="op">:</span> <span class="st">'/assets/test_image.png'</span>}<span class="op">,</span></span>
-<span id="cb19-10"><a href=""></a>  <span class="st">' and transcribe '</span><span class="op">,</span></span>
-<span id="cb19-11"><a href=""></a>  {<span class="dt">audioSource</span><span class="op">:</span> <span class="st">'/assets/test_audio.wav'</span>}</span>
-<span id="cb19-12"><a href=""></a>])<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb20-1"><a href=""></a><span class="kw">const</span> llm <span class="op">=</span> <span class="cf">await</span> LlmInference<span class="op">.</span><span class="fu">createFromOptions</span>(genai<span class="op">,</span> {</span>
+<span id="cb20-2"><a href=""></a>    <span class="co">// ...</span></span>
+<span id="cb20-3"><a href=""></a>    <span class="dt">maxNumImages</span><span class="op">:</span> <span class="dv">5</span><span class="op">,</span></span>
+<span id="cb20-4"><a href=""></a>    <span class="dt">supportAudio</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb20-5"><a href=""></a>})<span class="op">;</span></span>
+<span id="cb20-6"><a href=""></a></span>
+<span id="cb20-7"><a href=""></a><span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">generateResponse</span>([</span>
+<span id="cb20-8"><a href=""></a>  <span class="st">'Describe '</span><span class="op">,</span></span>
+<span id="cb20-9"><a href=""></a>  {<span class="dt">imageSource</span><span class="op">:</span> <span class="st">'/assets/test_image.png'</span>}<span class="op">,</span></span>
+<span id="cb20-10"><a href=""></a>  <span class="st">' and transcribe '</span><span class="op">,</span></span>
+<span id="cb20-11"><a href=""></a>  {<span class="dt">audioSource</span><span class="op">:</span> <span class="st">'/assets/test_audio.wav'</span>}</span>
+<span id="cb20-12"><a href=""></a>])<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <aside class="notes">
 <p>Gemma-3n es multimodal nativo. Pueden pasarle texto, imágenes y audio en el mismo prompt. Esto abre posibilidades increíbles para accesibilidad, análisis de video frame-a-frame, y asistentes de voz más naturales.</p>
 <style type="text/css">
@@ -1144,12 +1205,12 @@ El resultado aparecerá aquí…
 <li>Entrena pesos pequeños en tus datos.</li>
 <li>Carga dinámica en tiempo de ejecución.</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb20-1"><a href=""></a><span class="co">// Configuración</span></span>
-<span id="cb20-2"><a href=""></a>loraRanks<span class="op">:</span> [<span class="dv">4</span><span class="op">,</span> <span class="dv">8</span><span class="op">,</span> <span class="dv">16</span>]</span>
-<span id="cb20-3"><a href=""></a></span>
-<span id="cb20-4"><a href=""></a><span class="co">// Carga y Uso</span></span>
-<span id="cb20-5"><a href=""></a><span class="kw">const</span> loraModel <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">loadLoraModel</span>(loraModelUrl)<span class="op">;</span></span>
-<span id="cb20-6"><a href=""></a>llm<span class="op">.</span><span class="fu">generateResponse</span>(prompt<span class="op">,</span> loraModel<span class="op">,</span> callback)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb21-1"><a href=""></a><span class="co">// Configuración</span></span>
+<span id="cb21-2"><a href=""></a>loraRanks<span class="op">:</span> [<span class="dv">4</span><span class="op">,</span> <span class="dv">8</span><span class="op">,</span> <span class="dv">16</span>]</span>
+<span id="cb21-3"><a href=""></a></span>
+<span id="cb21-4"><a href=""></a><span class="co">// Carga y Uso</span></span>
+<span id="cb21-5"><a href=""></a><span class="kw">const</span> loraModel <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">loadLoraModel</span>(loraModelUrl)<span class="op">;</span></span>
+<span id="cb21-6"><a href=""></a>llm<span class="op">.</span><span class="fu">generateResponse</span>(prompt<span class="op">,</span> loraModel<span class="op">,</span> callback)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <aside class="notes">
 <p>LoRA (Low-Rank Adaptation) permite “afinar” el modelo para tareas específicas sin re-entrenarlo todo. Los pesos son pequeños (pocos MBs) y se pueden cargar dinámicamente. Imaginen tener un modelo base y cargar “plugins” de LoRA para diferentes estilos de escritura o conocimientos específicos.</p>
 <style type="text/css">
@@ -1168,12 +1229,12 @@ El resultado aparecerá aquí…
 <h2>Cargando el Modelo (Worker)</h2>
 <div class="split-layout code-heavy vertical">
 <div class="split-col code-col">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb21-1"><a href=""></a><span class="co">// perf-worker-gemma/src/worker.js</span></span>
-<span id="cb21-2"><a href=""></a><span class="im">import</span> { LlmInference<span class="op">,</span> FilesetResolver } <span class="im">from</span> <span class="st">'@mediapipe/tasks-genai'</span><span class="op">;</span></span>
-<span id="cb21-3"><a href=""></a></span>
-<span id="cb21-4"><a href=""></a><span class="kw">const</span> genai <span class="op">=</span> <span class="cf">await</span> FilesetResolver<span class="op">.</span><span class="fu">forGenAiTasks</span>(wasmPath)<span class="op">;</span></span>
-<span id="cb21-5"><a href=""></a><span class="kw">const</span> llm <span class="op">=</span> <span class="cf">await</span> LlmInference<span class="op">.</span><span class="fu">createFromModelPath</span>(genai<span class="op">,</span> modelUrl)<span class="op">;</span></span>
-<span id="cb21-6"><a href=""></a>self<span class="op">.</span><span class="fu">postMessage</span>({ <span class="dt">status</span><span class="op">:</span> <span class="st">'READY'</span> })<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb22-1"><a href=""></a><span class="co">// perf-worker-gemma/src/worker.js</span></span>
+<span id="cb22-2"><a href=""></a><span class="im">import</span> { LlmInference<span class="op">,</span> FilesetResolver } <span class="im">from</span> <span class="st">'@mediapipe/tasks-genai'</span><span class="op">;</span></span>
+<span id="cb22-3"><a href=""></a></span>
+<span id="cb22-4"><a href=""></a><span class="kw">const</span> genai <span class="op">=</span> <span class="cf">await</span> FilesetResolver<span class="op">.</span><span class="fu">forGenAiTasks</span>(wasmPath)<span class="op">;</span></span>
+<span id="cb22-5"><a href=""></a><span class="kw">const</span> llm <span class="op">=</span> <span class="cf">await</span> LlmInference<span class="op">.</span><span class="fu">createFromModelPath</span>(genai<span class="op">,</span> modelUrl)<span class="op">;</span></span>
+<span id="cb22-6"><a href=""></a>self<span class="op">.</span><span class="fu">postMessage</span>({ <span class="dt">status</span><span class="op">:</span> <span class="st">'READY'</span> })<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="split-col demo-col" style="justify-content: center;">
 <p><strong>Clave:</strong> ¡Haz esto en un Web Worker!</p>
@@ -1200,8 +1261,8 @@ Evita bloquear el hilo principal durante la carga pesada del modelo.
 <h2>Ejecutando Inferencia</h2>
 <div class="split-layout code-heavy vertical">
 <div class="split-col code-col">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb22-1"><a href=""></a><span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">generateResponse</span>(userPrompt)<span class="op">;</span></span>
-<span id="cb22-2"><a href=""></a>self<span class="op">.</span><span class="fu">postMessage</span>({ <span class="dt">text</span><span class="op">:</span> response })<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb23-1"><a href=""></a><span class="kw">const</span> response <span class="op">=</span> <span class="cf">await</span> llm<span class="op">.</span><span class="fu">generateResponse</span>(userPrompt)<span class="op">;</span></span>
+<span id="cb23-2"><a href=""></a>self<span class="op">.</span><span class="fu">postMessage</span>({ <span class="dt">text</span><span class="op">:</span> response })<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="split-col demo-col" style="justify-content: center;">
 <p><code>generateResponse</code> es síncrono y pesado.</p>
@@ -1258,8 +1319,109 @@ SIEMPRE usa un Web Worker.
 </section>
 <section id="demo-worker-vs-no-worker" class="slide level2">
 <h2>Demo: Worker vs No-Worker</h2>
-<iframe src="../perf-worker-gemma/dist/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload="">
+<iframe src="../perf-worker-gemma/src/index.html" width="100%" height="600px" style="border: 1px solid #555; background: white;" data-preload="">
 </iframe>
+</section></section>
+<section>
+<section id="transformers.js" class="title-slide slide level1 bg-advanced center">
+<h1>Transformers.js</h1>
+<ul style="background: rgba(0,0,0,0.6); padding: 40px; border-radius: 15px;">
+<li>
+<strong>Uso:</strong> Modelos de Hugging Face en el navegador.
+</li>
+<li>
+<strong>Stack:</strong> ONNX Runtime Web (WebAssembly / WebGPU).
+</li>
+<li>
+<strong>Librería:</strong> <span class="citation" data-cites="huggingface/transformers">@huggingface/transformers</span>.
+</li>
+</ul>
+<aside class="notes">
+<p>Transformers.js permite ejecutar modelos de última generación de Hugging Face directamente en el navegador.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="conceptos-básicos" class="slide level2 bg-advanced">
+<h2>Conceptos Básicos</h2>
+<p>Comienza creando una instancia de <code>pipeline()</code> y especificando la tarea.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb24-1"><a href=""></a><span class="im">import</span> { pipeline } <span class="im">from</span> <span class="st">'@huggingface/transformers'</span><span class="op">;</span></span>
+<span id="cb24-2"><a href=""></a></span>
+<span id="cb24-3"><a href=""></a><span class="co">// Crear pipeline de análisis de sentimientos</span></span>
+<span id="cb24-4"><a href=""></a><span class="kw">const</span> classifier <span class="op">=</span> <span class="cf">await</span> <span class="fu">pipeline</span>(<span class="st">'sentiment-analysis'</span>)<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<aside class="notes">
+<p>Al ejecutar por primera vez, descargará y almacenará en caché el modelo predeterminado. Las llamadas subsiguientes serán mucho más rápidas.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="inferencia" class="slide level2 bg-advanced">
+<h2>Inferencia</h2>
+<p>Usa el clasificador en tu texto objetivo:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb25-1"><a href=""></a><span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> <span class="fu">classifier</span>(<span class="st">'¡Amo Transformers.js!'</span>)<span class="op">;</span></span>
+<span id="cb25-2"><a href=""></a><span class="co">// [{'label': 'POSITIVE', 'score': 0.9998}]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Múltiples entradas:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb26-1"><a href=""></a><span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> <span class="fu">classifier</span>([</span>
+<span id="cb26-2"><a href=""></a>  <span class="st">'¡Amo Transformers.js!'</span><span class="op">,</span> </span>
+<span id="cb26-3"><a href=""></a>  <span class="st">'Odio los bugs.'</span></span>
+<span id="cb26-4"><a href=""></a>])<span class="op">;</span></span>
+<span id="cb26-5"><a href=""></a><span class="co">// [{'label': 'POSITIVE', ...}, {'label': 'NEGATIVE', ...}]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<aside class="notes">
+<p>La API es muy similar a la de Python, lo que facilita la migración.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="modelos-personalizados" class="slide level2 bg-advanced">
+<h2>Modelos Personalizados</h2>
+<p>Puedes especificar un modelo diferente como segundo argumento.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb27-1"><a href=""></a><span class="co">// Usar un modelo específico (ej. estrellas 1-5)</span></span>
+<span id="cb27-2"><a href=""></a><span class="kw">const</span> reviewer <span class="op">=</span> <span class="cf">await</span> <span class="fu">pipeline</span>(</span>
+<span id="cb27-3"><a href=""></a>  <span class="st">'sentiment-analysis'</span><span class="op">,</span> </span>
+<span id="cb27-4"><a href=""></a>  <span class="st">'Xenova/bert-base-multilingual-uncased-sentiment'</span></span>
+<span id="cb27-5"><a href=""></a>)<span class="op">;</span></span>
+<span id="cb27-6"><a href=""></a></span>
+<span id="cb27-7"><a href=""></a><span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> <span class="fu">reviewer</span>(</span>
+<span id="cb27-8"><a href=""></a>  <span class="st">'The Shawshank Redemption es una obra maestra.'</span></span>
+<span id="cb27-9"><a href=""></a>)<span class="op">;</span></span>
+<span id="cb27-10"><a href=""></a><span class="co">// [{label: '5 stars', score: 0.81...}]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<aside class="notes">
+<p>Por defecto usa modelos cuantizados para la web, pero puedes elegir cualquiera compatible en el Hub.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section></section>
 <section>
 <section id="respuestas-en-streaming-sse" class="title-slide slide level1 bg-advanced center">
@@ -1287,11 +1449,11 @@ SIEMPRE usa un Web Worker.
 <h2>Ejemplo Streaming Node.js</h2>
 <div class="split-layout code-heavy vertical">
 <div class="split-col code-col">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb23-1"><a href=""></a><span class="co">// gemini-node-sse/index.js</span></span>
-<span id="cb23-2"><a href=""></a><span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> model<span class="op">.</span><span class="fu">generateContentStream</span>(prompt)<span class="op">;</span></span>
-<span id="cb23-3"><a href=""></a><span class="cf">for</span> <span class="cf">await</span> (<span class="kw">const</span> chunk <span class="kw">of</span> result<span class="op">.</span><span class="at">stream</span>) {</span>
-<span id="cb23-4"><a href=""></a>    res<span class="op">.</span><span class="fu">write</span>(<span class="vs">`data: </span><span class="sc">${</span><span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(chunk<span class="op">.</span><span class="fu">text</span>())<span class="sc">}\n\n</span><span class="vs">`</span>)<span class="op">;</span></span>
-<span id="cb23-5"><a href=""></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode numberSource javascript number-lines code-with-copy"><code class="sourceCode javascript"><span id="cb28-1"><a href=""></a><span class="co">// gemini-node-sse/index.js</span></span>
+<span id="cb28-2"><a href=""></a><span class="kw">const</span> result <span class="op">=</span> <span class="cf">await</span> model<span class="op">.</span><span class="fu">generateContentStream</span>(prompt)<span class="op">;</span></span>
+<span id="cb28-3"><a href=""></a><span class="cf">for</span> <span class="cf">await</span> (<span class="kw">const</span> chunk <span class="kw">of</span> result<span class="op">.</span><span class="at">stream</span>) {</span>
+<span id="cb28-4"><a href=""></a>    res<span class="op">.</span><span class="fu">write</span>(<span class="vs">`data: </span><span class="sc">${</span><span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(chunk<span class="op">.</span><span class="fu">text</span>())<span class="sc">}\n\n</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb28-5"><a href=""></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="split-col demo-col" style="justify-content: center;">
 <p>Server-Sent Events (SSE) permite enviar actualizaciones en tiempo real al cliente.</p>
